@@ -347,11 +347,11 @@ export function ObservationForm({ visit, visitDateLabel, rubric, initial, readOn
               <label htmlFor="field-title" className="label-caps block">{HEADER_LABELS.title}</label>
               <div className="mt-1">{headerInput("title")}</div>
             </div>
-            <div className="border-r border-rule p-3 max-sm:border-b">
+            <div className="col-span-2 border-rule p-3 max-sm:border-b sm:col-span-1 sm:border-r">
               <label htmlFor="field-subject" className="label-caps block">{HEADER_LABELS.subject}</label>
               <div className="mt-1">{headerInput("subject")}</div>
             </div>
-            <div className="border-rule p-3 max-sm:border-b sm:border-r">
+            <div className="col-span-2 border-rule p-3 max-sm:border-b sm:col-span-1 sm:border-r">
               <label htmlFor="field-topic" className="label-caps block">{HEADER_LABELS.topic}</label>
               <div className="mt-1">{headerInput("topic")}</div>
             </div>
