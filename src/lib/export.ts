@@ -23,10 +23,10 @@ const STATUS_LABEL: Record<VisitListItem["status"], string> = {
 };
 
 /** Builds the export for one user. Observers get only their own visits; admin gets everything. Never passwords. */
-export async function buildExport(user: CurrentUser): Promise<Sheet[]> {
+export async function buildExport(user: CurrentUser, demo: boolean): Promise<Sheet[]> {
   const isAdmin = user.role === "ADMIN";
   const [visitList, rubric] = await Promise.all([
-    listVisits(isAdmin ? {} : { observerUserId: user.id }),
+    listVisits(isAdmin ? { demo } : { demo, observerUserId: user.id }),
     getRubric(),
   ]);
   const criteria = rubric.flatMap((a) => a.criteria.map((c) => ({ ...c, areaName: a.name })));
@@ -36,7 +36,7 @@ export async function buildExport(user: CurrentUser): Promise<Sheet[]> {
   const judgementRows: Cell[][] = [];
 
   for (const v of visitList) {
-    visitRows.push([v.date, v.period, v.observerName, v.teacherName, v.className, v.subject, STATUS_LABEL[v.status], v.ratedCount]);
+    visitRows.push([v.cycleLabel, v.date, v.period, v.observerName, v.teacherName, v.className, v.subject, STATUS_LABEL[v.status], v.ratedCount]);
     if (v.status === "not_started") continue;
     const state = await getObservationState(v);
     const j = judgementFor(rubric, state);
@@ -82,6 +82,12 @@ export async function buildExport(user: CurrentUser): Promise<Sheet[]> {
         ...(state.overall.level ? [`Overall: ${state.overall.reason}`] : []),
       ].join("\n") || null,
       STATUS_LABEL[v.status],
+      state.strengths || null,
+      state.improvements || null,
+      state.feedback || null,
+      state.sharedAt ? "Yes" : "No",
+      state.signedByTeacherAt ? state.signedByTeacherAt.slice(0, 10) : null,
+      state.reflection?.text ?? null,
     ]);
   }
 
@@ -89,6 +95,7 @@ export async function buildExport(user: CurrentUser): Promise<Sheet[]> {
     {
       name: "Visits",
       columns: [
+        { header: "Cycle", width: 18 },
         { header: "Date", width: 12 },
         { header: "Period", width: 8 },
         { header: "Observer", width: 18 },
@@ -136,6 +143,12 @@ export async function buildExport(user: CurrentUser): Promise<Sheet[]> {
         { header: "Overall Lesson Judgement", width: 16 },
         { header: "Reasons for changed judgements", width: 40, wrap: true },
         { header: "Status", width: 12 },
+        { header: "Areas of Strength", width: 50, wrap: true },
+        { header: "Suggested Areas for Improvement", width: 50, wrap: true },
+        { header: "Feedback message", width: 70, wrap: true },
+        { header: "Shared with teacher", width: 10 },
+        { header: "Teacher signed", width: 12 },
+        { header: "Teacher reflection", width: 50, wrap: true },
       ],
       rows: judgementRows,
     },

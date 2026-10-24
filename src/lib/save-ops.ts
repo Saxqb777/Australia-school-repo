@@ -9,6 +9,9 @@ export const HEADER_FIELDS = [
   "topic",
   "numberOnRoll",
   "numberPresent",
+  "strengthsText",
+  "improvementsText",
+  "feedbackText",
 ] as const;
 
 export type HeaderField = (typeof HEADER_FIELDS)[number];

@@ -64,9 +64,14 @@ export const OBSERVE_TOUR: TourStep[] = [
     body: "Each area is the average of its criteria, and the overall judgement is the average of the areas. You can change any of them, but you must give a reason.",
   },
   {
+    target: "feedback",
+    title: "Let the AI write the first draft",
+    body: "Once at least 10 criteria are rated, Write summary drafts the Areas of Strength, the Suggested Areas for Improvement and a 150 to 220 word message to the teacher, using only your ratings, the descriptors and your comments. Edit anything you like.",
+  },
+  {
     target: "complete",
-    title: "Finish the observation",
-    body: "When everything is filled in, mark the observation complete. Anything still missing is listed here with a link to it.",
+    title: "Finish, sign and share",
+    body: "Mark the observation complete when everything is filled in. Then open the official PDF, sign electronically as coordinator, and share it with the teacher. They read it, sign it and can reply with a reflection that appears here.",
   },
 ];
 
@@ -90,12 +95,53 @@ export const ADMIN_TOUR: TourStep[] = [
     title: "Export everything",
     body: "Download all visits, ratings, comments, judgements, teachers and the rubric as Excel or CSV. Passwords are never exported.",
   },
+  {
+    title: "Where to go next",
+    body: "Dashboard shows strengths and weaknesses across the school and suggests workshops and peer pairs. Workshops tracks them. Teachers shows each person's progress over time. Setup is where you add cycles, schedules, people and edit the rubric wording.",
+  },
+];
+
+export const DASHBOARD_TOUR: TourStep[] = [
+  {
+    target: "dash-filters",
+    title: "Filter the whole school",
+    body: "Narrow everything on this page by cycle, observer, subject or grade band. With all cycles, each teacher's latest observation is used.",
+  },
+  {
+    target: "dash-areas",
+    title: "Where the school is strong and weak",
+    body: "Each area's school average on the form's six-point scale, weakest first. The same for all 20 criteria alongside.",
+  },
+  {
+    target: "dash-heatmap",
+    title: "Every teacher, every criterion",
+    body: "Darker is stronger. Each cell shows the level's letters too, so nothing depends on colour. Click a teacher to see their progress.",
+  },
+  {
+    target: "dash-insights",
+    title: "Experts and teachers needing support",
+    body: "Very Good or Outstanding in an area makes a teacher an expert there. Acceptable or below flags a teacher for support in that area.",
+  },
+  {
+    target: "dash-plan",
+    title: "Workshops, planned for you",
+    body: "The weakest areas become workshop suggestions: who should attend, who should lead and which criteria to cover. The administrator schedules one with a click and everyone is told in the app.",
+  },
+  {
+    target: "dash-pairs",
+    title: "Pair colleagues",
+    body: "Each teacher needing support is matched with the strongest colleague in that area. Introduce sends both of them a note in the app.",
+  },
 ];
 
 export const TEACHER_TOUR: TourStep[] = [
   {
     title: "Your observations",
-    body: "This page will show your lesson observations once an observer completes and shares them, with your ratings and feedback.",
+    body: "When an observer shares your lesson observation it appears here. Open it to read the feedback, see your ratings on the official form, sign it electronically and write a short reflection back.",
+  },
+  {
+    title: "In Arabic too",
+    body: "On each observation, the عربي button shows the feedback in Arabic. The rubric wording stays in English, exactly as on the school's form.",
   },
   {
     target: "replay",

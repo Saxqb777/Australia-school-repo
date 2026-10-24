@@ -4,12 +4,10 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   HEADER_LABELS,
-  IMPROVEMENTS_HEADING,
   JUDGEMENT_TABLE,
   PERCENTAGE_KEY,
   PERCENTAGE_KEY_INTRO,
   RATING_LEVELS,
-  STRENGTHS_HEADING,
 } from "@/db/seed-data/rubric";
 import { fullDate } from "@/lib/dates";
 import { completenessIssues, type CompletenessIssue } from "@/lib/completeness";
@@ -17,9 +15,11 @@ import { computeJudgement, isLevel, levelLabel, type Level } from "@/lib/judgeme
 import { isPercentageCriterion } from "@/lib/percentage";
 import type { ObservationState, PreviousObservation, RubricArea, VisitSummary } from "@/lib/queries";
 import type { HeaderField, HeaderValues, SaveOp } from "@/lib/save-ops";
+import { FeedbackSection } from "./FeedbackSection";
 import { PercentageHelper } from "./PercentageHelper";
 import { RatingStrip } from "./RatingStrip";
 import { SaveIndicator } from "./SaveIndicator";
+import { SharePanel } from "./SharePanel";
 import { readPendingOps, useSaveQueue } from "./useSaveQueue";
 
 interface Props {
@@ -30,6 +30,7 @@ interface Props {
   readOnly: boolean;
   previous: PreviousObservation | null;
   backHref: string;
+  shareInfo: React.ComponentProps<typeof SharePanel>["initial"];
 }
 
 type Ratings = ObservationState["ratings"];
@@ -70,7 +71,7 @@ function AreaMarker({ rated, total }: { rated: number; total: number }) {
   );
 }
 
-export function ObservationForm({ visit, visitDateLabel, rubric, initial, readOnly, previous, backHref }: Props) {
+export function ObservationForm({ visit, visitDateLabel, rubric, initial, readOnly, previous, backHref, shareInfo }: Props) {
   const [header, setHeader] = useState<HeaderValues>(initial.header);
   const [ratings, setRatings] = useState<Ratings>(initial.ratings);
   const [areaOverrides, setAreaOverrides] = useState<AreaOverrides>(initial.areaOverrides);
@@ -544,22 +545,17 @@ export function ObservationForm({ visit, visitDateLabel, rubric, initial, readOn
           </details>
         </section>
 
-        {/* Phase 2 sections, shown as the form shows them */}
-        <section className="mt-8 grid border border-rule bg-sheet sm:grid-cols-2" aria-label="Strengths and improvements">
-          <div className="border-rule p-3 max-sm:border-b sm:border-r">
-            <h2 className="label-caps">{STRENGTHS_HEADING}</h2>
-            <p className="mt-2 text-sm text-ink-soft">
-              Written from your ratings and comments once AI feedback is switched on in the next phase. You will be able
-              to edit every line before anything is sent.
-            </p>
-          </div>
-          <div className="p-3">
-            <h2 className="label-caps">{IMPROVEMENTS_HEADING}</h2>
-            <p className="mt-2 text-sm text-ink-soft">
-              Suggested from the criteria rated lowest, in the same way, and always editable.
-            </p>
-          </div>
-        </section>
+        <FeedbackSection
+          visitId={visit.id}
+          header={header}
+          setHeaderField={setHeaderField}
+          locked={locked}
+          readOnly={readOnly}
+          ratedTotal={ratedTotal}
+          teacherName={visit.teacherName}
+          observerName={visit.observerName}
+          flushNow={queue.flushNow}
+        />
 
         {/* Complete */}
         <section className="mt-8 border-t-2 border-navy pt-5" data-tour="complete" aria-labelledby="complete-h">
@@ -575,10 +571,16 @@ export function ObservationForm({ visit, visitDateLabel, rubric, initial, readOn
                   : ""}
                 . The ratings are locked.
               </p>
-              {!readOnly ? (
-                <button type="button" className="btn btn-quiet mt-3" disabled={busy} onClick={() => void changeStatus("reopen")}>
+              <SharePanel visitId={visit.id} teacherName={visit.teacherName} readOnly={readOnly} initial={shareInfo} />
+              {!readOnly && !shareInfo.signedByTeacherAt ? (
+                <button type="button" className="btn btn-quiet mt-4" disabled={busy} onClick={() => void changeStatus("reopen")}>
                   Reopen to make changes
                 </button>
+              ) : null}
+              {completeMessage ? (
+                <p role="alert" className="mt-3 border-l-2 border-navy bg-navy-wash px-3 py-2 text-sm">
+                  {completeMessage}
+                </p>
               ) : null}
             </div>
           ) : readOnly ? (

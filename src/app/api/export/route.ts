@@ -1,4 +1,5 @@
 import { buildExport, toCsv, toXlsx } from "@/lib/export";
+import { getMode } from "@/lib/mode";
 import { getCurrentUser } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -11,11 +12,9 @@ function stamp(): string {
 export async function GET(request: Request) {
   const user = await getCurrentUser();
   if (!user || user.mustChangePassword) return new Response("Sign in to export your data.", { status: 401 });
-  if (user.role === "TEACHER") {
-    return new Response("Export of your own observations arrives with the teacher portal.", { status: 403 });
-  }
+  if (user.role === "TEACHER") return new Response("Teachers can open each observation as a PDF from their page.", { status: 403 });
   const format = new URL(request.url).searchParams.get("format") === "csv" ? "csv" : "xlsx";
-  const sheets = await buildExport(user);
+  const sheets = await buildExport(user, (await getMode()) === "demo");
   const who = user.role === "ADMIN" ? "all" : user.username.replace(/[^a-z0-9.]/gi, "");
   const base = `asad-observations-${who}-${stamp()}`;
   const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };

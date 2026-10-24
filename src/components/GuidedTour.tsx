@@ -9,7 +9,7 @@ export interface TourStep {
   body: string;
 }
 
-export type TourKey = "visits" | "observe" | "admin" | "teacher";
+export type TourKey = "visits" | "observe" | "admin" | "teacher" | "dashboard";
 
 const REPLAY_EVENT = "asad:tour-replay";
 

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { signIn, signOut } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { isDemoMode } from "@/lib/mode";
 import { getCurrentUser, homePathFor } from "@/lib/session";
 
 export interface FormState {
@@ -24,10 +25,19 @@ export async function loginAction(_prev: FormState, formData: FormData): Promise
     return { error: null };
   } catch (error) {
     if (error instanceof AuthError) {
+      if (await isDemoMode()) return { error: "Sign-in with passwords opens when the administrator presses Go live." };
       return { error: "That username and password don't match. Check both and try again." };
     }
     throw error;
   }
+}
+
+/** One-click sign-in as any person, only while the system is in demo mode. */
+export async function demoSignInAction(formData: FormData): Promise<void> {
+  const userId = String(formData.get("userId") ?? "");
+  const target = await db.query.users.findFirst({ where: eq(users.id, userId), columns: { role: true } });
+  if (!target) redirect("/login");
+  await signIn("demo", { userId, redirectTo: homePathFor(target.role) });
 }
 
 export async function logoutAction(): Promise<void> {
@@ -49,6 +59,7 @@ const passwordSchema = z
 export async function changePasswordAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (user.demo) return { error: "Passwords can't be changed in the demo. Each person sets their own after Go live." };
   const parsed = passwordSchema.safeParse({
     current: formData.get("current"),
     next: formData.get("next"),

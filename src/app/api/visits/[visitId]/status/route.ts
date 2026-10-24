@@ -32,9 +32,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
   if (!state.observationId) return fail(400, "invalid", "Rate the lesson before marking it complete.");
 
   if (parsed.data.action === "reopen") {
+    if (state.signedByTeacherAt) {
+      return fail(409, "complete", "The teacher has signed this observation, so it can no longer be changed.");
+    }
+    // Reopening withdraws it from the teacher and clears the coordinator signature until it is complete again.
     await db
       .update(observations)
-      .set({ status: "draft", completedAt: null, updatedAt: new Date() })
+      .set({
+        status: "draft",
+        completedAt: null,
+        sharedAt: null,
+        signedByCoordinatorAt: null,
+        signedByCoordinatorName: null,
+        updatedAt: new Date(),
+      })
       .where(eq(observations.id, state.observationId));
     return NextResponse.json({ ok: true, status: "draft" });
   }

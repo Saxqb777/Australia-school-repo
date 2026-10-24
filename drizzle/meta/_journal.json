@@ -15,6 +15,13 @@
       "when": 1792859983964,
       "tag": "0001_tours",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792863151744,
+      "tag": "0002_phase2to4",
+      "breakpoints": true
     }
   ]
 }

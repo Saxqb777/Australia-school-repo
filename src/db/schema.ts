@@ -19,6 +19,13 @@ export const roleEnum = pgEnum("role", ["ADMIN", "OBSERVER", "TEACHER"]);
 export const gradeBandEnum = pgEnum("grade_band", ["KG", "LOWER_PRIMARY", "UPPER_PRIMARY"]);
 export const observationStatusEnum = pgEnum("observation_status", ["draft", "complete"]);
 
+export interface ArabicCache {
+  sourceHash: string;
+  strengths: string;
+  improvements: string;
+  feedback: string;
+}
+
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 const updatedAt = () => timestamp("updated_at", { withTimezone: true }).notNull().defaultNow();
 
@@ -59,6 +66,8 @@ export const observationCycles = pgTable(
     label: text("label").notNull(),
     startDate: date("start_date").notNull(),
     endDate: date("end_date").notNull(),
+    /** Sample data shown before Go live. Deleted, with everything under it, when the school goes live. */
+    isDemo: boolean("is_demo").notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [uniqueIndex("observation_cycles_year_term_week").on(t.academicYear, t.term, t.week)],
@@ -148,6 +157,13 @@ export const observations = pgTable(
     completedAt: timestamp("completed_at", { withTimezone: true }),
     signedByTeacherAt: timestamp("signed_by_teacher_at", { withTimezone: true }),
     signedByCoordinatorAt: timestamp("signed_by_coordinator_at", { withTimezone: true }),
+    signedByCoordinatorName: text("signed_by_coordinator_name"),
+    signedByTeacherName: text("signed_by_teacher_name"),
+    /** When the observer shared the completed observation with the teacher's portal. */
+    sharedAt: timestamp("shared_at", { withTimezone: true }),
+    summaryGeneratedAt: timestamp("summary_generated_at", { withTimezone: true }),
+    /** Arabic translation of the teacher-facing text, keyed by a hash of the English it was made from. */
+    arabicCache: jsonb("arabic_cache").$type<ArabicCache | null>(),
     /** Per-field client timestamps (ms) so late-arriving offline saves never overwrite newer edits. */
     fieldClock: jsonb("field_clock").$type<Record<string, number>>().notNull().default({}),
     createdAt: createdAt(),
@@ -205,6 +221,170 @@ export const areaJudgements = pgTable(
     ),
   ],
 );
+
+export const deliveryChannelEnum = pgEnum("delivery_channel", ["portal", "copy", "pdf", "email"]);
+export const workshopStatusEnum = pgEnum("workshop_status", ["scheduled", "completed", "cancelled"]);
+
+/** How feedback reached the teacher, and when they first opened it in the portal. */
+export const feedbackDeliveries = pgTable(
+  "feedback_deliveries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    observationId: uuid("observation_id")
+      .notNull()
+      .references(() => observations.id, { onDelete: "cascade" }),
+    channel: deliveryChannelEnum("channel").notNull(),
+    sentByUserId: uuid("sent_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+    openedAt: timestamp("opened_at", { withTimezone: true }),
+  },
+  (t) => [index("feedback_deliveries_observation_idx").on(t.observationId)],
+);
+
+export const teacherReflections = pgTable("teacher_reflections", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  observationId: uuid("observation_id")
+    .notNull()
+    .unique()
+    .references(() => observations.id, { onDelete: "cascade" }),
+  teacherId: uuid("teacher_id")
+    .notNull()
+    .references(() => teachers.id, { onDelete: "cascade" }),
+  text: text("text").notNull(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const workshops = pgTable("workshops", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  areaId: integer("area_id")
+    .notNull()
+    .references(() => rubricAreas.id),
+  leadTeacherId: uuid("lead_teacher_id").references(() => teachers.id, { onDelete: "set null" }),
+  date: date("date").notNull(),
+  time: text("time"),
+  location: text("location"),
+  criterionCodes: text("criterion_codes").array().notNull().default(sql`'{}'::text[]`),
+  status: workshopStatusEnum("status").notNull().default("scheduled"),
+  notes: text("notes"),
+  isDemo: boolean("is_demo").notNull().default(false),
+  createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+  createdAt: createdAt(),
+});
+
+export const workshopAttendees = pgTable(
+  "workshop_attendees",
+  {
+    workshopId: uuid("workshop_id")
+      .notNull()
+      .references(() => workshops.id, { onDelete: "cascade" }),
+    teacherId: uuid("teacher_id")
+      .notNull()
+      .references(() => teachers.id, { onDelete: "cascade" }),
+    /** null until attendance is taken. */
+    attended: boolean("attended"),
+  },
+  (t) => [primaryKey({ columns: [t.workshopId, t.teacherId] })],
+);
+
+/** A teacher paired with a stronger colleague in one area. */
+export const peerPairings = pgTable(
+  "peer_pairings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    teacherId: uuid("teacher_id")
+      .notNull()
+      .references(() => teachers.id, { onDelete: "cascade" }),
+    partnerTeacherId: uuid("partner_teacher_id")
+      .notNull()
+      .references(() => teachers.id, { onDelete: "cascade" }),
+    areaId: integer("area_id")
+      .notNull()
+      .references(() => rubricAreas.id),
+    note: text("note"),
+    introducedAt: timestamp("introduced_at", { withTimezone: true }).notNull().defaultNow(),
+    introducedByUserId: uuid("introduced_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    isDemo: boolean("is_demo").notNull().default(false),
+  },
+  (t) => [uniqueIndex("peer_pairings_unique").on(t.teacherId, t.partnerTeacherId, t.areaId)],
+);
+
+/** In-app notices (the school does not use email from this system). */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    href: text("href"),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    isDemo: boolean("is_demo").notNull().default(false),
+    createdAt: createdAt(),
+  },
+  (t) => [index("notifications_user_idx").on(t.userId)],
+);
+
+export interface DigestPayload {
+  weekStart: string;
+  weekEnd: string;
+  visitsDone: number;
+  visitsOutstanding: number;
+  outstandingList: { teacher: string; observer: string; date: string }[];
+  topStrengths: { code: string; name: string; mean: number }[];
+  topConcerns: { code: string; name: string; mean: number }[];
+}
+
+/** The Friday summary for admin, generated by the weekly job. */
+export const digests = pgTable("digests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  weekStart: date("week_start").notNull(),
+  payload: jsonb("payload").$type<DigestPayload>().notNull(),
+  isDemo: boolean("is_demo").notNull().default(false),
+  generatedAt: timestamp("generated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Every change to a rating or a judgement override. */
+export const ratingAudit = pgTable(
+  "rating_audit",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    observationId: uuid("observation_id")
+      .notNull()
+      .references(() => observations.id, { onDelete: "cascade" }),
+    criterionId: integer("criterion_id"),
+    areaId: integer("area_id"),
+    field: text("field").notNull(),
+    oldValue: text("old_value"),
+    newValue: text("new_value"),
+    reason: text("reason"),
+    changedByUserId: uuid("changed_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    changedAt: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("rating_audit_observation_idx").on(t.observationId)],
+);
+
+/** Every change to the rubric wording made through the admin editor. */
+export const rubricEdits = pgTable("rubric_edits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  criterionId: integer("criterion_id")
+    .notNull()
+    .references(() => rubricCriteria.id, { onDelete: "cascade" }),
+  level: integer("level"),
+  oldText: text("old_text").notNull(),
+  newText: text("new_text").notNull(),
+  editedByUserId: uuid("edited_by_user_id").references(() => users.id, { onDelete: "set null" }),
+  editedAt: timestamp("edited_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: updatedAt(),
+});
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   teacher: one(teachers, { fields: [users.id], references: [teachers.userId] }),

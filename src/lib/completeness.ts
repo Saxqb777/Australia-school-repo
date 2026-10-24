@@ -8,6 +8,9 @@ export const REQUIRED_HEADER_FIELDS: { field: HeaderField; label: string }[] = [
   { field: "topic", label: "Topic" },
   { field: "numberOnRoll", label: "Number on roll" },
   { field: "numberPresent", label: "Number present" },
+  { field: "strengthsText", label: "Areas of Strength" },
+  { field: "improvementsText", label: "Suggested Areas for Improvement" },
+  { field: "feedbackText", label: "Feedback message to the teacher" },
 ];
 
 export interface CompletenessInput {

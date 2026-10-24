@@ -2,7 +2,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/db";
-import { areaJudgements, observationRatings, observations, rubricAreas, rubricCriteria } from "@/db/schema";
+import { areaJudgements, observationRatings, observations, ratingAudit, rubricAreas, rubricCriteria } from "@/db/schema";
 import { visitAccess } from "@/lib/access";
 import { ensureObservation } from "@/lib/observations";
 import { HEADER_FIELDS, type HeaderField, type SaveError, type SaveResponse } from "@/lib/save-ops";
@@ -11,7 +11,7 @@ import { getCurrentUser } from "@/lib/session";
 const ts = z.number().int().positive();
 const level = z.number().int().min(1).max(6).nullable();
 const opSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("header"), field: z.enum(HEADER_FIELDS), value: z.string().max(500), ts }),
+  z.object({ kind: z.literal("header"), field: z.enum(HEADER_FIELDS), value: z.string().max(6000), ts }),
   z.object({ kind: z.literal("rating"), criterionId: z.number().int(), level, ts }),
   z.object({ kind: z.literal("comment"), criterionId: z.number().int(), comment: z.string().max(4000), ts }),
   z.object({ kind: z.literal("area"), areaId: z.number().int(), level, reason: z.string().max(2000), ts }),
@@ -71,6 +71,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
   const criterionIds = new Set(criteriaRows.map((r) => r.id));
   const areaIds = new Set(areaRows.map((r) => r.id));
 
+  // Current values, so every rating or judgement change can be written to the audit log.
+  const [existingRatings, existingAreas] = await Promise.all([
+    db.select().from(observationRatings).where(eq(observationRatings.observationId, observation.id)),
+    db.select().from(areaJudgements).where(eq(areaJudgements.observationId, observation.id)),
+  ]);
+  const currentLevel = new Map(existingRatings.map((r) => [r.criterionId, r.level]));
+  const currentArea = new Map(existingAreas.map((a) => [a.areaId, a.overrideLevel]));
+  const audit: (typeof ratingAudit.$inferInsert)[] = [];
+  const asText = (v: number | null | undefined): string | null => (v === null || v === undefined ? null : String(v));
+
   const clock: Record<string, number> = { ...observation.fieldClock };
   const headerUpdates: Partial<typeof observations.$inferInsert> = {};
   let overallUpdate: { level: number | null; reason: string | null } | null = null;
@@ -86,17 +96,40 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
       if ((clock.overall ?? 0) >= op.ts) continue;
       overallUpdate = { level: op.level, reason: op.level === null ? null : op.reason.trim() || null };
       clock.overall = op.ts;
+      if (op.level !== observation.overallOverrideLevel) {
+        audit.push({
+          observationId: observation.id,
+          field: "overall_override",
+          oldValue: asText(observation.overallOverrideLevel),
+          newValue: asText(op.level),
+          reason: overallUpdate.reason,
+          changedByUserId: user.id,
+        });
+      }
     } else if (op.kind === "rating") {
       if (!criterionIds.has(op.criterionId)) continue;
       const at = new Date(op.ts);
-      await db
+      const applied = await db
         .insert(observationRatings)
         .values({ observationId: observation.id, criterionId: op.criterionId, level: op.level, levelClientTs: at })
         .onConflictDoUpdate({
           target: [observationRatings.observationId, observationRatings.criterionId],
           set: { level: op.level, levelClientTs: at, updatedAt: new Date() },
           setWhere: sql`${observationRatings.levelClientTs} is null or ${observationRatings.levelClientTs} < excluded.level_client_ts`,
+        })
+        .returning({ criterionId: observationRatings.criterionId });
+      const before = currentLevel.get(op.criterionId) ?? null;
+      if (applied.length > 0 && before !== op.level) {
+        audit.push({
+          observationId: observation.id,
+          criterionId: op.criterionId,
+          field: "rating",
+          oldValue: asText(before),
+          newValue: asText(op.level),
+          changedByUserId: user.id,
         });
+        currentLevel.set(op.criterionId, op.level);
+      }
     } else if (op.kind === "comment") {
       if (!criterionIds.has(op.criterionId)) continue;
       const at = new Date(op.ts);
@@ -113,16 +146,32 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
       if (!areaIds.has(op.areaId)) continue;
       const at = new Date(op.ts);
       const reason = op.level === null ? null : op.reason.trim() || null;
-      await db
+      const applied = await db
         .insert(areaJudgements)
         .values({ observationId: observation.id, areaId: op.areaId, overrideLevel: op.level, reason, clientTs: at })
         .onConflictDoUpdate({
           target: [areaJudgements.observationId, areaJudgements.areaId],
           set: { overrideLevel: op.level, reason, clientTs: at, updatedAt: new Date() },
           setWhere: sql`${areaJudgements.clientTs} is null or ${areaJudgements.clientTs} < excluded.client_ts`,
+        })
+        .returning({ areaId: areaJudgements.areaId });
+      const before = currentArea.get(op.areaId) ?? null;
+      if (applied.length > 0 && before !== op.level) {
+        audit.push({
+          observationId: observation.id,
+          areaId: op.areaId,
+          field: "area_override",
+          oldValue: asText(before),
+          newValue: asText(op.level),
+          reason,
+          changedByUserId: user.id,
         });
+        currentArea.set(op.areaId, op.level);
+      }
     }
   }
+
+  if (audit.length > 0) await db.insert(ratingAudit).values(audit);
 
   const now = new Date();
   await db

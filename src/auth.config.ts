@@ -13,11 +13,15 @@ export const authConfig = {
       return Boolean(auth?.user);
     },
     jwt({ token, user }) {
-      if (user?.id) token.uid = user.id;
+      if (user?.id) {
+        token.uid = user.id;
+        token.demo = user.demo === true;
+      }
       return token;
     },
     session({ session, token }) {
       if (typeof token.uid === "string") session.user.id = token.uid;
+      session.user.demo = token.demo === true;
       return session;
     },
   },

@@ -64,4 +64,4 @@ export const OBSERVER_USERS = [
   { name: "Ms. Marwa", username: "marwa" },
 ] as const;
 
-export const ADMIN_USER = { name: "Administrator", username: "saaqibkhan58@gmail.com" } as const;
+export const ADMIN_USER = { name: "Administrator", username: "admin" } as const;
