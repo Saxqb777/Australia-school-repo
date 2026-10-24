@@ -147,50 +147,59 @@ export function ObservationPdf({ visit, state, rubric, judgement, crestPath, dat
           ))}
         </View>
 
-        {rubric.map((area) => (
-          <View key={area.id}>
-            <View wrap={false} minPresenceAhead={110}>
-              <Text style={s.band}>{area.name}</Text>
-            </View>
-            <View style={s.grid}>
-              <View style={s.row} minPresenceAhead={90}>
-                <View style={[s.cell, s.th, { width: W.area }]}>
-                  <Text>{RUBRIC_COLUMN_HEADINGS.area}</Text>
+        {rubric.map((area) => {
+          const header = (
+            <View style={s.row}>
+              <View style={[s.cell, s.th, { width: W.area }]}>
+                <Text>{RUBRIC_COLUMN_HEADINGS.area}</Text>
+              </View>
+              {RATING_LEVELS.map((l) => (
+                <View key={l.level} style={[s.cell, s.th, { width: W.level }]}>
+                  <Text>{l.label}</Text>
                 </View>
-                {RATING_LEVELS.map((l) => (
-                  <View key={l.level} style={[s.cell, s.th, { width: W.level }]}>
-                    <Text>{l.label}</Text>
-                  </View>
-                ))}
-                <View style={[s.cell, s.th, { width: W.comments }]}>
-                  <Text>{RUBRIC_COLUMN_HEADINGS.comments}</Text>
+              ))}
+              <View style={[s.cell, s.th, { width: W.comments }]}>
+                <Text>{RUBRIC_COLUMN_HEADINGS.comments}</Text>
+              </View>
+            </View>
+          );
+          const criterionRow = (c: RubricArea["criteria"][number]) => {
+            const r = state.ratings[c.id];
+            return (
+              <View key={c.id} style={s.row} wrap={false}>
+                <View style={[s.cell, { width: W.area }]}>
+                  <Text style={s.label}>{c.name}</Text>
+                </View>
+                {RATING_LEVELS.map((l) => {
+                  const chosen = r?.level === l.level;
+                  return (
+                    <View key={l.level} style={[s.cell, { width: W.level }, chosen ? s.chosen : {}]}>
+                      {chosen ? <Tick /> : null}
+                      <Text style={chosen ? s.chosenText : s.descriptor}>{c.descriptors[l.level]}</Text>
+                    </View>
+                  );
+                })}
+                <View style={[s.cell, { width: W.comments }]}>
+                  <Text style={s.descriptor}>{r?.comment ?? ""}</Text>
                 </View>
               </View>
-              {area.criteria.map((c) => {
-                const r = state.ratings[c.id];
-                return (
-                  <View key={c.id} style={s.row} wrap={false}>
-                    <View style={[s.cell, { width: W.area }]}>
-                      <Text style={s.label}>{c.name}</Text>
-                    </View>
-                    {RATING_LEVELS.map((l) => {
-                      const chosen = r?.level === l.level;
-                      return (
-                        <View key={l.level} style={[s.cell, { width: W.level }, chosen ? s.chosen : {}]}>
-                          {chosen ? <Tick /> : null}
-                          <Text style={chosen ? s.chosenText : s.descriptor}>{c.descriptors[l.level]}</Text>
-                        </View>
-                      );
-                    })}
-                    <View style={[s.cell, { width: W.comments }]}>
-                      <Text style={s.descriptor}>{r?.comment ?? ""}</Text>
-                    </View>
-                  </View>
-                );
-              })}
+            );
+          };
+          const [first, ...rest] = area.criteria;
+          return (
+            <View key={area.id}>
+              {/* The area heading always starts a page section together with its column headings and first criterion. */}
+              <View wrap={false}>
+                <Text style={s.band}>{area.name}</Text>
+                <View style={s.grid}>
+                  {header}
+                  {first ? criterionRow(first) : null}
+                </View>
+              </View>
+              {rest.length > 0 ? <View style={[s.grid, { borderTopWidth: 0 }]}>{rest.map(criterionRow)}</View> : null}
             </View>
-          </View>
-        ))}
+          );
+        })}
 
         <View wrap={false}>
           <Text style={s.h2}>{PERCENTAGE_KEY_INTRO}</Text>

@@ -648,7 +648,6 @@ export function ObservationForm({ visit, visitDateLabel, rubric, initial, readOn
           <a
             href="#judgement"
             className="flex min-h-11 flex-[1.4] flex-col items-center justify-center bg-navy px-1 text-white"
-            aria-label="Overall lesson judgement"
           >
             <span className="font-cond text-[0.7rem] font-semibold uppercase leading-tight tracking-wide">Overall</span>
             <span className="text-[0.7rem] leading-tight">
