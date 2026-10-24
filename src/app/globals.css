@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f3f5f7;
+  --color-sheet: #ffffff;
+  --color-ink: #121a22;
+  --color-ink-soft: #4b5866;
+  --color-ink-faint: #6e7b88;
+  --color-rule: #d3dae1;
+  --color-rule-strong: #93a1ae;
+  --color-navy: #0a3655;
+  --color-navy-deep: #06263d;
+  --color-navy-wash: #e6eef4;
+
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-cond: var(--font-plex-cond), var(--font-plex-sans), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-sm: 2px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-navy);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-navy-wash);
+  }
+}
+
+@layer components {
+  /* Condensed small caps label, like the printed form's column headings. */
+  .label-caps {
+    font-family: var(--font-cond);
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+  .field {
+    width: 100%;
+    background: var(--color-sheet);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.7rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+  }
+  .field:focus {
+    border-color: var(--color-navy);
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--color-navy);
+  }
+  .field:disabled {
+    background: var(--color-paper);
+    color: var(--color-ink-soft);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1.1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid var(--color-navy);
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+  .btn-primary {
+    background: var(--color-navy);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: var(--color-navy-deep);
+  }
+  .btn-primary:disabled {
+    background: var(--color-rule-strong);
+    border-color: var(--color-rule-strong);
+    cursor: not-allowed;
+  }
+  .btn-quiet {
+    background: transparent;
+    color: var(--color-navy);
+  }
+  .btn-quiet:hover {
+    background: var(--color-navy-wash);
+  }
+  .link {
+    color: var(--color-navy);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
