@@ -25,6 +25,10 @@ export async function resetPasswordAction(_prev: ResetState, formData: FormData)
   if (!admin || admin.role !== "ADMIN" || admin.mustChangePassword) {
     return { userId: null, name: null, username: null, password: null, error: "Only the administrator can reset passwords." };
   }
+  const { isDemoMode } = await import("@/lib/mode");
+  if (await isDemoMode()) {
+    return { userId: null, name: null, username: null, password: null, error: "Passwords can be reset after Go live." };
+  }
   const parsed = z.uuid().safeParse(formData.get("userId"));
   if (!parsed.success) return { userId: null, name: null, username: null, password: null, error: "Unknown user." };
   const target = await db.query.users.findFirst({ where: eq(users.id, parsed.data) });
@@ -37,4 +41,14 @@ export async function resetPasswordAction(_prev: ResetState, formData: FormData)
     .where(eq(users.id, target.id));
   revalidatePath("/admin");
   return { userId: target.id, name: target.name, username: target.username, password, error: null };
+}
+
+/** Builds this week's Friday summary now, in addition to the automatic Friday run. */
+export async function generateDigestAction(): Promise<void> {
+  const admin = await getCurrentUser();
+  if (!admin || admin.role !== "ADMIN") return;
+  const { saveDigest, weekStartOf } = await import("@/lib/digest");
+  const { getMode } = await import("@/lib/mode");
+  await saveDigest((await getMode()) === "demo", weekStartOf(new Date()));
+  revalidatePath("/admin");
 }

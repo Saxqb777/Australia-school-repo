@@ -13,7 +13,7 @@ import { TEACHER_TOUR } from "@/lib/tours";
 export const metadata: Metadata = { title: "My observations" };
 
 export default async function TeacherHome() {
-  const user = await requireUser(["TEACHER"]);
+  const user = await requireUser(["TEACHER", "OBSERVER"]);
   const demo = (await getMode()) === "demo";
   const rows = user.teacherId
     ? await db

@@ -1,4 +1,4 @@
-import { Document, Image, Page, Path, StyleSheet, Svg, Text, View } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, Path, StyleSheet, Svg, Text, View } from "@react-pdf/renderer";
 import {
   FORM_TITLE,
   HEADER_LABELS,
@@ -14,6 +14,9 @@ import {
 } from "@/db/seed-data/rubric";
 import { levelLabel, type LessonJudgement } from "../judgement";
 import type { ObservationState, RubricArea, VisitSummary } from "../queries";
+
+// Never split words: the rubric wording must read exactly as on the school's form.
+Font.registerHyphenationCallback((word) => [word]);
 
 const NAVY = "#0A3655";
 const WASH = "#E6EEF4";
@@ -146,11 +149,11 @@ export function ObservationPdf({ visit, state, rubric, judgement, crestPath, dat
 
         {rubric.map((area) => (
           <View key={area.id}>
-            <Text style={s.band} minPresenceAhead={60}>
-              {area.name}
-            </Text>
+            <View wrap={false} minPresenceAhead={110}>
+              <Text style={s.band}>{area.name}</Text>
+            </View>
             <View style={s.grid}>
-              <View style={s.row} fixed={false}>
+              <View style={s.row} minPresenceAhead={90}>
                 <View style={[s.cell, s.th, { width: W.area }]}>
                   <Text>{RUBRIC_COLUMN_HEADINGS.area}</Text>
                 </View>

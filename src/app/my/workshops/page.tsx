@@ -8,7 +8,7 @@ import { listPairingsFor, listWorkshops } from "@/lib/workshops";
 export const metadata: Metadata = { title: "My workshops" };
 
 export default async function MyWorkshopsPage() {
-  const user = await requireUser(["TEACHER"]);
+  const user = await requireUser(["TEACHER", "OBSERVER"]);
   const demo = (await getMode()) === "demo";
   const items = user.teacherId ? await listWorkshops(demo, [], user.teacherId) : [];
   const pairs = user.teacherId ? await listPairingsFor(demo, user.teacherId) : [];

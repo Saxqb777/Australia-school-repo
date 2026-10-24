@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Lesson feedback" };
 
 export default async function TeacherObservationPage({ params }: { params: Promise<{ visitId: string }> }) {
   const { visitId } = await params;
-  const user = await requireUser(["TEACHER"]);
+  const user = await requireUser(["TEACHER", "OBSERVER"]);
   if (!z.uuid().safeParse(visitId).success) notFound();
   if ((await visitAccess(user, visitId)) !== "teacher") notFound();
   const visit = await getVisit(visitId);

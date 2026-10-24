@@ -19,3 +19,16 @@ Approved and built: Percentage key helper, Previous observation peek, Ready-to-c
    itself.
 7. **"Last time" marker.** While rating, a small marker shows the level this teacher received last time for
    that criterion.
+
+## Phases 2 to 4
+1. **Evidence links:** each AI line shows the rating or comment it came from.
+2. **Read receipt on the visits list:** a small mark when a teacher has opened their feedback.
+3. **Reflection prompts:** 2 or 3 guided questions for the teacher, based on their improvement areas.
+4. **Send all at once:** share every completed observation from a day in one action.
+5. **Signing reminder:** an in-app nudge if a teacher hasn't signed after 3 days.
+6. **Workshop materials:** an AI-drafted one-page outline for each suggested workshop, using only the rubric
+   wording and the school's own data.
+7. **Grade band comparison:** KG, Lower Primary and Upper Primary side by side on the dashboard.
+8. **Observer consistency check:** how differently Ms. Ayan and Ms. Marwa rate the same criteria, to support
+   moderation.
+9. **Termly report for leadership:** a printable summary of progress, workshops and pairings across a term.

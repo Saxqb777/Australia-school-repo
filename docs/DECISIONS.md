@@ -39,7 +39,7 @@ Phase 1 decisions and why. Newest at the bottom.
     editable in Phase 4.
 11. **Usernames.**
     - Usernames are first names in lower case, with a dot before a second name (`asmaa.aly`, `fatma.hassan`).
-    - The admin's username is their email address.
+    - The admin's username is `admin`, shown as "Administrator". No personal name or email appears in the app.
     - Temporary passwords are never stored in the repository.
 12. **"Title" header field** is kept as free text exactly as on the form. Its meaning (observer title or lesson
     title) is left to the observers.
@@ -71,3 +71,32 @@ Phase 1 decisions and why. Newest at the bottom.
 20. **Known advisories.**
     - `postcss` (bundled with Next 15) only affects processing untrusted CSS, which this app never does.
     - `uuid` is overridden to 11.x for exceljs.
+21. **No email.**
+    - The school uses its own registered mail, so this system sends none.
+    - Sharing, invitations, introductions and the Friday summary all arrive as in-app notifications.
+    - Feedback can still be copied or downloaded as a PDF.
+22. **AI model and guard rails.**
+    - Claude Sonnet 5.5, structured output, medium effort, with the server-side refusal fallback.
+    - The server checks the school's rules (line counts, word count, opening, closing, no dashes) and retries once.
+      Anything still off is shown to the observer, never silently "fixed".
+    - At least 10 rated criteria are needed before a draft.
+23. **Demo data lives in the same database, marked `is_demo`** (on cycles, workshops, pairings, notifications and
+    digests).
+    - Everything under a demo cycle is removed by cascade on Go live.
+    - Demo sessions are only valid before Go live, and password sessions only after it.
+24. **Demo uses real staff names** at the product owner's request. Every demo page carries a "Sample ratings, not
+    real judgements" banner, and every demo PDF a matching label.
+25. **Experts, support and pairing rules.**
+    - Expert = area level Very Good or Outstanding. Needing support = Acceptable or below.
+    - Both use each teacher's latest completed observation in the current filter.
+    - Workshop suggestions cover the three weakest areas that have at least one teacher needing support.
+26. **Workshop effect.** Area level in the last observation before the workshop compared with the first observation
+    after it, for attendees marked present.
+27. **Reopening.** Reopening a completed observation withdraws it from the teacher and clears the coordinator
+    signature. Once the teacher has signed, it can no longer be reopened.
+28. **Observers who are also observed** (for example a peer observer promoted to observer) keep a "My own
+    observations" page.
+29. **Arabic.** The teacher-facing feedback is translated on demand by the same model and cached until the English
+    changes. The rubric wording is never translated.
+30. **PDF** uses the built-in Helvetica for reliable print. Hyphenation is disabled so descriptor wording reads
+    exactly as on the form.

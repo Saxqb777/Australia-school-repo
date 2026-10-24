@@ -30,7 +30,8 @@ export async function visitAccess(user: CurrentUser, visitId: string): Promise<V
   if (visit.isDemo !== ((await getMode()) === "demo")) return "none";
   if (visit.observerUserId === user.id && (user.role === "OBSERVER" || user.role === "ADMIN")) return "edit";
   if (user.role === "ADMIN") return "read";
-  if (user.role === "TEACHER" && visit.teacherUserId === user.id && visit.sharedAt !== null) return "teacher";
+  // The observed teacher (whatever else they do in school) sees their own observation once it is shared.
+  if (visit.teacherUserId === user.id && visit.sharedAt !== null) return "teacher";
   return "none";
 }
 

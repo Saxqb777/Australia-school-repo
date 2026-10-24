@@ -99,7 +99,10 @@ export async function AppShell({
         </div>
         <nav aria-label="Main" className={`mx-auto ${width} overflow-x-auto px-2 sm:px-4`}>
           <ul className="flex gap-1 whitespace-nowrap text-sm">
-            {NAV[user.role].map((item) => (
+            {[
+              ...NAV[user.role],
+              ...(user.role === "OBSERVER" && user.teacherId ? [{ key: "my" as NavKey, label: "My own observations", href: "/my" }] : []),
+            ].map((item) => (
               <li key={item.key}>
                 <Link
                   href={item.href}
