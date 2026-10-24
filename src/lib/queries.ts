@@ -81,6 +81,8 @@ export interface VisitSummary {
   date: string;
   period: number;
   cycleLabel: string;
+  cycleStart: string;
+  cycleEnd: string;
 }
 
 export async function getVisit(visitId: string): Promise<VisitSummary | null> {
@@ -96,6 +98,8 @@ export async function getVisit(visitId: string): Promise<VisitSummary | null> {
       date: visits.date,
       period: visits.period,
       cycleLabel: observationCycles.label,
+      cycleStart: observationCycles.startDate,
+      cycleEnd: observationCycles.endDate,
     })
     .from(visits)
     .innerJoin(teachers, eq(teachers.id, visits.teacherId))
@@ -201,6 +205,8 @@ export async function listVisits(filter: { observerUserId?: string }): Promise<V
       date: visits.date,
       period: visits.period,
       cycleLabel: observationCycles.label,
+      cycleStart: observationCycles.startDate,
+      cycleEnd: observationCycles.endDate,
       observationId: observations.id,
       observationStatus: observations.status,
     })

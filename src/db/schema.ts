@@ -31,6 +31,8 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   mustChangePassword: boolean("must_change_password").notNull().default(true),
   passwordChangedAt: timestamp("password_changed_at", { withTimezone: true }),
+  /** Guided tours this user has finished or skipped, by tour key (for example "visits", "observe"). */
+  toursCompleted: text("tours_completed").array().notNull().default(sql`'{}'::text[]`),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });

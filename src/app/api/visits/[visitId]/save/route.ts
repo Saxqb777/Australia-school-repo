@@ -39,6 +39,14 @@ function headerColumnValue(field: HeaderField, raw: string): HeaderColumnValue |
   return value === "" ? null : raw;
 }
 
+function setHeaderColumn(target: Partial<typeof observations.$inferInsert>, field: HeaderField, value: HeaderColumnValue): void {
+  if (field === "numberOnRoll" || field === "numberPresent") {
+    target[field] = typeof value === "number" ? value : null;
+  } else {
+    target[field] = typeof value === "string" ? value : null;
+  }
+}
+
 export async function POST(request: Request, { params }: { params: Promise<{ visitId: string }> }) {
   const { visitId } = await params;
   const user = await getCurrentUser();
@@ -64,7 +72,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
   const areaIds = new Set(areaRows.map((r) => r.id));
 
   const clock: Record<string, number> = { ...observation.fieldClock };
-  const headerUpdates: Partial<Record<HeaderField, HeaderColumnValue>> = {};
+  const headerUpdates: Partial<typeof observations.$inferInsert> = {};
   let overallUpdate: { level: number | null; reason: string | null } | null = null;
 
   for (const op of parsed.data.ops) {
@@ -72,7 +80,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
       if ((clock[op.field] ?? 0) >= op.ts) continue;
       const value = headerColumnValue(op.field, op.value);
       if (value === undefined) continue;
-      headerUpdates[op.field] = value;
+      setHeaderColumn(headerUpdates, op.field, value);
       clock[op.field] = op.ts;
     } else if (op.kind === "overall") {
       if ((clock.overall ?? 0) >= op.ts) continue;

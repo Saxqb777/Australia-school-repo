@@ -14,6 +14,7 @@ export interface CurrentUser {
   username: string;
   role: Role;
   mustChangePassword: boolean;
+  toursCompleted: string[];
 }
 
 /** Loads the signed-in user from the database on every request, so role and password state are never stale. */
@@ -29,6 +30,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     username: user.username,
     role: user.role,
     mustChangePassword: user.mustChangePassword,
+    toursCompleted: user.toursCompleted,
   };
 });
 
