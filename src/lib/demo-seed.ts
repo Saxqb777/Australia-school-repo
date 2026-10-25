@@ -511,7 +511,7 @@ export async function seedDemoData(): Promise<DemoSummary> {
   }
   await db.insert(notifications).values(notes.map((n) => ({ ...n, isDemo: true })));
 
-  // Everyone sees the guided tours again in the demo.
+  // Everyone sees the welcome story, the guided tours and an empty first-steps checklist again in the demo.
   await db.update(users).set({ toursCompleted: [] });
   await db.insert(appSettings).values({ key: "mode", value: "demo" }).onConflictDoNothing();
   return { cycles: 2, visits: visitCount, completed };

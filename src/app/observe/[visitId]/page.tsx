@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { GuidedTour } from "@/components/GuidedTour";
 import { ObservationForm } from "@/components/observe/ObservationForm";
+import { WelcomeStory } from "@/components/welcome/WelcomeStory";
 import { db } from "@/db";
 import { feedbackDeliveries } from "@/db/schema";
 import { visitAccess } from "@/lib/access";
@@ -64,6 +65,8 @@ export default async function ObservePage({ params }: { params: Promise<{ visitI
       {!readOnly ? (
         <GuidedTour tourKey="observe" steps={OBSERVE_TOUR} autoStart={!user.toursCompleted.includes("observe")} />
       ) : null}
+      {/* Never starts by itself mid-lesson; "Watch the intro" in the guide plays it here. */}
+      <WelcomeStory role={user.role} name={user.name} demo={demo} autoStart={false} />
     </main>
   );
 }

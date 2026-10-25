@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { feedbackDeliveries, notifications, observations, teacherReflections } from "@/db/schema";
 import { jsonError, loadVisitContext } from "@/lib/api-guard";
+import { markStep } from "@/lib/progress";
 
 const bodySchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("share") }),
@@ -34,6 +35,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
     if (body.action === "share") {
       await db.update(observations).set({ sharedAt: now }).where(eq(observations.id, observationId));
       await db.insert(feedbackDeliveries).values({ observationId, channel: "portal", sentByUserId: user.id });
+      await markStep(user, "share");
       if (visit.teacherUserId) {
         await db.insert(notifications).values({
           userId: visit.teacherUserId,
@@ -54,6 +56,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
       .update(observations)
       .set({ signedByCoordinatorAt: now, signedByCoordinatorName: visit.observerName })
       .where(eq(observations.id, observationId));
+    await markStep(user, "sign");
     return NextResponse.json({ ok: true, signedAt: now.toISOString(), name: visit.observerName });
   }
 
@@ -76,6 +79,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
           isNull(feedbackDeliveries.openedAt),
         ),
       );
+    await markStep(user, "open");
     return NextResponse.json({ ok: true });
   }
   if (body.action === "sign_teacher") {
@@ -83,6 +87,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
       .update(observations)
       .set({ signedByTeacherAt: now, signedByTeacherName: visit.teacherName })
       .where(eq(observations.id, observationId));
+    await markStep(user, "sign-teacher");
     if (visit.observerUserId) {
       await db.insert(notifications).values({
         userId: visit.observerUserId,
@@ -100,6 +105,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
     .insert(teacherReflections)
     .values({ observationId, teacherId: visit.teacherId, text: body.text })
     .onConflictDoUpdate({ target: teacherReflections.observationId, set: { text: body.text, updatedAt: now } });
+  await markStep(user, "reflect");
   if (visit.observerUserId) {
     await db.insert(notifications).values({
       userId: visit.observerUserId,

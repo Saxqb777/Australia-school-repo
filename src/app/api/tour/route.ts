@@ -5,9 +5,12 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { getCurrentUser } from "@/lib/session";
 
-const bodySchema = z.object({ tour: z.enum(["visits", "observe", "admin", "teacher", "dashboard"]) });
+const bodySchema = z.object({ tour: z.enum(["visits", "observe", "admin", "teacher", "dashboard", "welcome", "steps-dismissed"]) });
 
-/** Records that the signed-in user finished or skipped a guided tour, so it doesn't start on its own again. */
+/**
+ * Records that the signed-in user finished or skipped a guided tour or the welcome story, so it doesn't start on its
+ * own again, or closed their finished first-steps checklist.
+ */
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ ok: false }, { status: 401 });

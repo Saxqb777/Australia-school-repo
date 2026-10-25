@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { areaJudgements, observationRatings, observations, ratingAudit, rubricAreas, rubricCriteria } from "@/db/schema";
 import { visitAccess } from "@/lib/access";
 import { ensureObservation } from "@/lib/observations";
+import { markStep } from "@/lib/progress";
 import { HEADER_FIELDS, type HeaderField, type SaveError, type SaveResponse } from "@/lib/save-ops";
 import { getCurrentUser } from "@/lib/session";
 
@@ -172,6 +173,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ vis
   }
 
   if (audit.length > 0) await db.insert(ratingAudit).values(audit);
+  if (audit.some((a) => a.field === "rating" && a.newValue !== null)) await markStep(user, "rate");
 
   const now = new Date();
   await db

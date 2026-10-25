@@ -10,7 +10,11 @@ labelled "Demo" on every page. Nothing here is a real judgement.
   visits and the school dashboard. The administrator sees everything."
 
 ## 2. The observer during a lesson (5 minutes), as **Ms. Ayan**, ideally on a phone
-1. **My visits:** the week by day, with status marks. The floating guide explains the page.
+0. **The welcome story** opens by itself, in four parts. On the second part, let them **tap a level** and watch the
+   form's own words appear. The third part types a letter. The last part shows Share and the teacher's notice. Press
+   **Open my next visit**, or Skip intro and continue below.
+1. **My visits:** the week by day, with status marks. Point at **Your first observation**: four empty boxes that
+   will tick themselves as you go.
 2. Open **Ms. Walaa** (Thursday, Period 1, not started).
 3. Fill the lesson details. Tap a level on a few criteria and show that **the form's exact descriptor** appears.
 4. Show the **"Saved"** status at the top. Turn on airplane mode, tap a rating: **"Offline · kept on this device"**.
@@ -22,10 +26,13 @@ labelled "Demo" on every page. Nothing here is a real judgement.
    form with every rating ticked.
 
 ## 3. The teacher (3 minutes): switch role to **Ms. Walaa** (banner, Switch role, View as another teacher)
+0. The teacher's welcome story, in English with Arabic under each part: try the **عربي** switch and the **Sign**
+   button.
 1. The bell shows a new notice. Open the observation.
 2. Read the letter, strengths and improvements. Press **عربي** to show the Arabic version.
 3. **Sign electronically**, then write a one-line **reflection** and send it.
 4. Switch back to Ms. Ayan and open the visit: the teacher's signature and reflection are there.
+5. Open **My visits**: the first-steps boxes are now all ticked.
 
 ## 4. The school leadership view (5 minutes), as **Ms. Ayan** or **Administrator** (they now see the same)
 1. **Register:** every visit, the Friday summary, logins.

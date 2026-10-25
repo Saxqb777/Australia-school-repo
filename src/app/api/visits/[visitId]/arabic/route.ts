@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { observations } from "@/db/schema";
 import { SummaryUnavailableError, translateToArabic } from "@/lib/ai/summary";
 import { jsonError, loadVisitContext } from "@/lib/api-guard";
+import { markStep } from "@/lib/progress";
 
 export const maxDuration = 120;
 
@@ -12,8 +13,9 @@ export const maxDuration = 120;
 export async function POST(_request: Request, { params }: { params: Promise<{ visitId: string }> }) {
   const ctx = await loadVisitContext((await params).visitId);
   if (ctx instanceof NextResponse) return ctx;
-  const { access, state } = ctx;
+  const { user, access, state } = ctx;
   if (access === "none" || !state.observationId) return jsonError(404, "Not found.");
+  if (access === "teacher") await markStep(user, "arabic");
   const source = { strengths: state.strengths, improvements: state.improvements, feedback: state.feedback };
   const sourceHash = createHash("sha256").update(JSON.stringify(source)).digest("hex");
   const row = await db.query.observations.findFirst({

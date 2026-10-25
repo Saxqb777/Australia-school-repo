@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { AppShell, PageHeading } from "@/components/AppShell";
+import { FirstSteps } from "@/components/FirstSteps";
 import { GuidedTour, ReplayTourButton } from "@/components/GuidedTour";
 import { db } from "@/db";
 import { observationCycles, observations, visits } from "@/db/schema";
@@ -34,6 +35,8 @@ export default async function TeacherHome() {
         .orderBy(visits.date)
     : [];
   rows.reverse();
+  const stepRow = rows.find((r) => !r.signedAt) ?? rows[0];
+  const stepTarget = stepRow ? `/my/${stepRow.visitId}` : null;
 
   return (
     <AppShell user={user} active="my">
@@ -42,6 +45,9 @@ export default async function TeacherHome() {
           <ReplayTourButton />
         </span>
       </PageHeading>
+      {user.role === "TEACHER" && stepTarget ? (
+        <FirstSteps user={user} kind="teacher" hrefs={{ open: stepTarget, arabic: stepTarget, "sign-teacher": stepTarget, reflect: stepTarget }} />
+      ) : null}
       {rows.length === 0 ? (
         <div className="mt-8 max-w-xl border-l-2 border-navy pl-4">
           <h2 className="font-cond text-xl font-semibold">Nothing shared with you yet</h2>

@@ -112,3 +112,13 @@ Phase 1 decisions and why. Newest at the bottom.
 33. **Files.**
     - Originals are stored in the database: up to 4 MB each, and large photos are scaled down in the browser first.
     - Old .xls Excel files are not supported; save them as .xlsx.
+34. **Welcome story data.**
+    - The story loads its data only when it opens (`/api/welcome`), so pages pay nothing for it.
+    - Coordinators see their own week and the live wording of criterion 1.1.
+    - The example letter and notices are labelled "Example" and are never saved.
+    - It never starts by itself on the observation form, so it can't interrupt a lesson.
+35. **First-steps ticks are real actions,** recorded on the server where each action happens (save, summary,
+    sign, share, opened, Arabic, teacher sign, reflection).
+    - They are stored as `step:<key>` in `users.tours_completed`, next to the finished tours, so Go live and Reset
+      the demo clear both with no extra table.
+    - The check is skipped once a step is ticked.

@@ -32,3 +32,14 @@ Approved and built: Percentage key helper, Previous observation peek, Ready-to-c
 8. **Observer consistency check:** how differently Ms. Ayan and Ms. Marwa rate the same criteria, to support
    moderation.
 9. **Termly report for leadership:** a printable summary of progress, workshops and pairings across a term.
+
+## Welcome and guides
+1. **Short screen recordings.** A 20-second silent clip per role (rate, draft, share) that plays in the welcome story
+   in place of the drawn example.
+2. **Arabic welcome for coordinators too.** The same Arabic line under each part, if Ms. Ayan or Ms. Marwa would
+   like to show it to Arabic-speaking staff.
+3. **"What's new" card.** After an update, a one-card story that shows only what changed, then gets out of the way.
+4. **Checklist for the administrator.** Try each role, open the dashboard, export once, then Go live: ticked as it
+   happens, ending on the Go live button.
+5. **Printable one-page guide.** The four steps for observers and teachers on one A4 page, for the staffroom
+   noticeboard.

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AppShell, PageHeading } from "@/components/AppShell";
 import { ExportMenu } from "@/components/ExportMenu";
+import { FirstSteps } from "@/components/FirstSteps";
 import { GuidedTour, ReplayTourButton } from "@/components/GuidedTour";
 import { StatusMark } from "@/components/StatusMark";
 import { dateRange, dayMonth, weekdayName } from "@/lib/dates";
@@ -20,6 +21,9 @@ export default async function VisitsPage() {
   const complete = visits.filter((v) => v.status === "complete").length;
   const inProgress = visits.filter((v) => v.status === "in_progress").length;
   const firstOpen = visits.find((v) => v.status !== "complete") ?? visits[0];
+  const started = visits.find((v) => v.status === "in_progress") ?? firstOpen;
+  const toShare = visits.find((v) => v.status === "complete" && !v.shared);
+  const href = (v: VisitListItem | undefined) => (v ? `/observe/${v.id}` : null);
 
   return (
     <AppShell user={user} active="visits">
@@ -29,6 +33,14 @@ export default async function VisitsPage() {
         </span>
         <ExportMenu scopeLabel="Everything: visits, ratings, judgements, feedback, teachers, logins (no passwords), rubric" />
       </PageHeading>
+
+      {user.role === "OBSERVER" && visits.length > 0 ? (
+        <FirstSteps
+          user={user}
+          kind="observer"
+          hrefs={{ rate: href(firstOpen), summary: href(started), sign: href(started), share: href(toShare ?? started) }}
+        />
+      ) : null}
 
       {visits.length === 0 ? (
         <div className="mt-10 max-w-xl border-l-2 border-navy pl-4">

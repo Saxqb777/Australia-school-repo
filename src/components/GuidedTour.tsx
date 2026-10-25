@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { WELCOME_DONE, WELCOME_REPLAY, welcomeIsOpen } from "./welcome/events";
 
 export interface TourStep {
   /** Matches an element with data-tour="<target>". Omit for a centred step. */
@@ -54,11 +55,21 @@ export function GuidedTour({ tourKey, steps, autoStart }: { tourKey: TourKey; st
   }, [record]);
 
   useEffect(() => {
-    if (autoStart) {
-      const t = window.setTimeout(() => setOpen(true), 500);
-      return () => window.clearTimeout(t);
-    }
-    return undefined;
+    if (!autoStart) return undefined;
+    let t = 0;
+    // Wait for the welcome story, if it is showing, so only one guide is on screen at a time.
+    const start = () => {
+      t = window.setTimeout(() => setOpen(true), 400);
+    };
+    const first = window.setTimeout(() => {
+      if (welcomeIsOpen()) window.addEventListener(WELCOME_DONE, start, { once: true });
+      else start();
+    }, 500);
+    return () => {
+      window.clearTimeout(first);
+      window.clearTimeout(t);
+      window.removeEventListener(WELCOME_DONE, start);
+    };
   }, [autoStart]);
 
   useEffect(() => {
@@ -151,7 +162,7 @@ export function GuidedTour({ tourKey, steps, autoStart }: { tourKey: TourKey; st
       >
         <div className="flex items-center justify-between gap-3 border-b border-rule px-4 py-2.5">
           <span className="label-caps !text-navy">How it works</span>
-          <ol className="flex gap-1" aria-label={`Step ${index + 1} of ${steps.length}`}>
+          <ol className="ml-auto flex gap-1" aria-label={`Step ${index + 1} of ${steps.length}`}>
             {steps.map((s, i) => (
               <li
                 key={s.title}
@@ -168,6 +179,11 @@ export function GuidedTour({ tourKey, steps, autoStart }: { tourKey: TourKey; st
               </li>
             ))}
           </ol>
+          <button type="button" onClick={close} aria-label="Close the guide" className="-mr-2 grid size-8 place-items-center text-ink-soft hover:bg-navy-wash hover:text-navy">
+            <svg viewBox="0 0 12 12" className="size-3" aria-hidden>
+              <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          </button>
         </div>
         <div className="px-4 pb-4 pt-3">
           <p className="font-mono text-xs text-ink-faint">
@@ -178,9 +194,22 @@ export function GuidedTour({ tourKey, steps, autoStart }: { tourKey: TourKey; st
           </h2>
           <p className="mt-1.5 text-[0.95rem] leading-relaxed text-ink">{step.body}</p>
           <div className="mt-4 flex items-center gap-2">
-            <button type="button" onClick={close} className="mr-auto text-sm text-ink-soft underline underline-offset-2">
-              {last ? "Close" : "Skip tour"}
-            </button>
+            {index === 0 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  close();
+                  window.dispatchEvent(new Event(WELCOME_REPLAY));
+                }}
+                className="mr-auto text-sm text-ink-soft underline underline-offset-2"
+              >
+                Watch the intro
+              </button>
+            ) : (
+              <button type="button" onClick={close} className="mr-auto text-sm text-ink-soft underline underline-offset-2">
+                {last ? "Close" : "Skip"}
+              </button>
+            )}
             {index > 0 ? (
               <button type="button" className="btn btn-quiet !min-h-10" onClick={() => setIndex(index - 1)}>
                 Back

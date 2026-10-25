@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { notifications } from "@/db/schema";
 import { getMode } from "@/lib/mode";
 import { ROLE_LABEL, homePathFor, type CurrentUser } from "@/lib/session";
+import { WelcomeStory } from "./welcome/WelcomeStory";
 
 type NavKey =
   | "visits"
@@ -127,6 +128,7 @@ export async function AppShell({
       <main id="main" className={`mx-auto ${width} px-4 pb-16 pt-6 sm:px-6 sm:pt-8`}>
         {children}
       </main>
+      <WelcomeStory role={user.role} name={user.name} demo={mode === "demo"} autoStart={!user.toursCompleted.includes("welcome")} />
     </>
   );
 }

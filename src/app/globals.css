@@ -118,3 +118,57 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Welcome story: one orchestrated entrance per scene, then quiet. */
+@keyframes wl-fade {
+  from { opacity: 0; }
+}
+@keyframes wl-sheet-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+}
+@keyframes wl-rise {
+  from { opacity: 0; transform: translateY(10px); }
+}
+@keyframes wl-drop {
+  0% { opacity: 0; transform: translateY(-22px); }
+  70% { opacity: 1; transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+@keyframes wl-pop {
+  0% { opacity: 0; transform: scale(0.4); }
+  70% { opacity: 1; transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+@keyframes wl-stamp {
+  0% { opacity: 0; transform: scale(1.7) rotate(-9deg); }
+  60% { opacity: 1; transform: scale(0.96) rotate(-2deg); }
+  100% { transform: scale(1) rotate(-2deg); }
+}
+@keyframes wl-invite {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(10, 54, 85, 0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(10, 54, 85, 0); }
+}
+@keyframes wl-caret {
+  50% { opacity: 0; }
+}
+@keyframes wl-tap {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.wl-backdrop { animation: wl-fade 240ms ease-out both; }
+.wl-sheet { animation: wl-sheet-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.wl-stage > *, .wl-copy { animation: wl-fade 260ms ease-out both; }
+.wl-rise { animation: wl-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.wl-drop { animation: wl-drop 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.wl-pop { animation: wl-pop 360ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.wl-stamp { animation: wl-stamp 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.wl-invite { animation: wl-invite 1.6s ease-in-out 600ms infinite; }
+.wl-caret { animation: wl-caret 1s steps(1) infinite; }
+.wl-tap { animation: wl-tap 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .wl-invite,
+  .wl-caret,
+  .wl-tap {
+    animation: none !important;
+  }
+}

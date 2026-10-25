@@ -1,5 +1,32 @@
 # Changelog
 
+## A new welcome and simpler guides (2026-10-25)
+- **Welcome story** on first sign-in: a full-screen intro of three or four parts, one idea in each, with a small
+  live demonstration.
+  - **Ms. Ayan and Ms. Marwa:**
+    - Their real week of visits.
+    - The real first criterion to try: tap a level and the form's exact words appear.
+    - A letter that types itself from ratings.
+    - "Saved, even offline", then Share and the teacher's notice arriving.
+    - It ends on "Open my next visit".
+  - **Teachers**, in English with Arabic under each part:
+    - The notice arriving.
+    - An English and Arabic switch to try.
+    - A Sign button that stamps an electronic signature, followed by a reflection.
+  - **Administrator:**
+    - Who sees what, as a grid of ticked boxes.
+    - Switch role.
+    - Go live, typed out.
+  - Skip intro is always there. It works with a keyboard and by swiping on a phone, and respects reduced motion.
+- **"Your first steps" checklist** on My visits (coordinators) and My observations (teachers):
+  - Four boxes that tick themselves as the person really does each thing.
+  - Coordinators: rate a lesson, draft the letter with AI, mark complete and sign, share.
+  - Teachers: open, read in Arabic, sign, reflect.
+  - The next step links straight to the right visit. It can be closed once finished.
+- **Shorter page guides:** at most four steps a page, one sentence each. A page guide waits until the welcome story
+  is closed. **Watch the intro** on a guide's first step plays the story again, including on the observation form.
+- Go live and Reset the demo start the story, guides and checklist afresh.
+
 ## "Peer observations" renamed to "Team leader observations" (2026-10-25)
 - The menu, page titles, upload box, review screen, comparison table and sample form now say **Team leader
   observations** and **team leader** instead of "peer observations" and "peer observer".
