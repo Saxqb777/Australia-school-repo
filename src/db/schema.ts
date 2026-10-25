@@ -83,7 +83,7 @@ export const visits = pgTable(
       .references(() => observationCycles.id, { onDelete: "cascade" }),
     /** Set when the observer has a login (Ms. Ayan, Ms. Marwa). */
     observerUserId: uuid("observer_user_id").references(() => users.id, { onDelete: "set null" }),
-    /** Observer's name exactly as on the schedule; kept for peer observers without a login. */
+    /** Observer's name exactly as on the schedule; kept for team leaders without a login. */
     observerName: text("observer_name").notNull(),
     teacherId: uuid("teacher_id")
       .notNull()
@@ -394,7 +394,7 @@ const bytea = customType<{ data: Buffer; driverData: string | Buffer }>({
   },
 });
 
-/** The original file a peer observer handed in (PDF, scan or photo), kept so it can be checked against. */
+/** The original file a team leader handed in (PDF, scan or photo), kept so it can be checked against. */
 export const peerFiles = pgTable("peer_files", {
   id: uuid("id").primaryKey().defaultRandom(),
   fileName: text("file_name").notNull(),

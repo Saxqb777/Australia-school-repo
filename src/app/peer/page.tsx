@@ -8,7 +8,7 @@ import { listPeer, peerMean, peerRaters } from "@/lib/peer";
 import { requireUser } from "@/lib/session";
 import { PeerUpload } from "./PeerUpload";
 
-export const metadata: Metadata = { title: "Peer observations" };
+export const metadata: Metadata = { title: "Team leader observations" };
 
 function describeDifference(d: number | null): string {
   if (d === null) return "Not enough overlap yet";
@@ -25,7 +25,7 @@ export default async function PeerPage() {
   const toCheck = rows.filter((r) => r.status === "needs_check");
   return (
     <AppShell user={user} active="peer" wide>
-      <PageHeading eyebrow="Separate from official observations" title="Peer observations" />
+      <PageHeading eyebrow="Separate from official observations" title="Team leader observations" />
       <p className="mt-4 max-w-3xl text-ink-soft">
         Observations by teachers who visit colleagues without an observer login. They are kept apart from Ms. Ayan&rsquo;s and
         Ms. Marwa&rsquo;s observations: they never count in the dashboard, experts, workshops or a teacher&rsquo;s own page.
@@ -35,7 +35,7 @@ export default async function PeerPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_24rem]">
         <section aria-labelledby="peer-list-h">
           <h2 id="peer-list-h" className="font-cond text-xl font-semibold text-navy">
-            All peer observations
+            All team leader observations
           </h2>
           {toCheck.length > 0 ? (
             <p className="mt-1 text-sm font-medium text-navy">{toCheck.length} waiting to be checked against the original.</p>
@@ -49,7 +49,7 @@ export default async function PeerPage() {
               <table className="w-full min-w-[44rem] text-sm">
                 <thead>
                   <tr className="bg-navy text-left text-white">
-                    {["Date", "Peer observer", "Teacher observed", "Class · Subject", "Average given", "Status"].map((h) => (
+                    {["Date", "Team leader", "Teacher observed", "Class · Subject", "Average given", "Status"].map((h) => (
                       <th key={h} scope="col" className="px-3 py-2 font-cond font-semibold">
                         {h}
                       </th>
@@ -86,20 +86,20 @@ export default async function PeerPage() {
 
       <section className="mt-12" aria-labelledby="raters-h">
         <h2 id="raters-h" className="font-cond text-xl font-semibold text-navy">
-          How each peer observer rates
+          How each team leader rates
         </h2>
         <p className="mt-1 max-w-3xl text-sm text-ink-soft">
-          Each peer observer&rsquo;s checked ratings compared with Ms. Ayan&rsquo;s and Ms. Marwa&rsquo;s latest observation of the same
-          teachers, criterion by criterion. Useful for moderation and for coaching peer observers.
+          Each team leader&rsquo;s checked ratings compared with Ms. Ayan&rsquo;s and Ms. Marwa&rsquo;s latest observation of the same
+          teachers, criterion by criterion. Useful for moderation and for coaching team leaders.
         </p>
         {raters.length === 0 ? (
-          <p className="mt-3 text-ink-soft">Appears once peer observations have been checked.</p>
+          <p className="mt-3 text-ink-soft">Appears once team leader observations have been checked.</p>
         ) : (
           <div className="mt-3 overflow-x-auto border border-rule bg-sheet">
             <table className="w-full min-w-[40rem] text-sm">
               <thead>
                 <tr className="bg-navy text-left text-white">
-                  {["Peer observer", "Observations", "Average level given", "Compared with the coordinators"].map((h) => (
+                  {["Team leader", "Observations", "Average level given", "Compared with the coordinators"].map((h) => (
                     <th key={h} scope="col" className="px-3 py-2 font-cond font-semibold">
                       {h}
                     </th>

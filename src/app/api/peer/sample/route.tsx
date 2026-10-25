@@ -9,7 +9,7 @@ import { canManage, getCurrentUser } from "@/lib/session";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Demo only: a completed form, as a peer observer would hand it in, to try the upload with. */
+/** Demo only: a completed form, as a team leader would hand it in, to try the upload with. */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user || !canManage(user)) return new Response("Not allowed.", { status: 403 });
@@ -55,7 +55,7 @@ export async function GET() {
   return new Response(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": 'attachment; filename="Sample-peer-observation-Ms-Irimia.pdf"',
+      "Content-Disposition": 'attachment; filename="Sample-team-leader-observation-Ms-Irimia.pdf"',
       "Cache-Control": "no-store",
     },
   });

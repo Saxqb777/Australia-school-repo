@@ -8,11 +8,11 @@ import { canManage, getCurrentUser } from "@/lib/session";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
-/** Upload a peer observer's completed form; the AI reads it into a record for checking. */
+/** Upload a team leader's completed form; the AI reads it into a record for checking. */
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user || user.mustChangePassword || !canManage(user)) {
-    return NextResponse.json({ ok: false, message: "Only the coordinators and the administrator can add peer observations." }, { status: 403 });
+    return NextResponse.json({ ok: false, message: "Only the coordinators and the administrator can add team leader observations." }, { status: 403 });
   }
   const form = await request.formData().catch(() => null);
   const file = form?.get("file");

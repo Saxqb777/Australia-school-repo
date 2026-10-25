@@ -1,5 +1,11 @@
 # Changelog
 
+## "Peer observations" renamed to "Team leader observations" (2026-10-25)
+- The menu, page titles, upload box, review screen, comparison table and sample form now say **Team leader
+  observations** and **team leader** instead of "peer observations" and "peer observer".
+- Nothing else changed: the web address stays `/peer`, existing records are untouched, and the dashboard's
+  **Peer pairing** keeps its name because it is a different feature.
+
 ## Coordinator access, peer observations, import from any file (2026-10-25)
 - **Ms. Ayan and Ms. Marwa run the system:**
   - They have every page the administrator has: register, setup, schedule import, people, password resets, rubric

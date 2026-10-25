@@ -70,7 +70,7 @@ const PeerSchema = z.object({
 
 export type PeerReading = z.infer<typeof PeerSchema>;
 
-/** Reads a completed Teacher Observation Form (typed, scanned or photographed) handed in by a peer observer. */
+/** Reads a completed Teacher Observation Form (typed, scanned or photographed) handed in by a team leader. */
 export async function readPeerForm(
   data: Buffer,
   mimeType: string,

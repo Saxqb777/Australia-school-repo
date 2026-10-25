@@ -369,7 +369,7 @@ export async function seedDemoData(): Promise<DemoSummary> {
     teacherRows.filter((t) => attendees.filter((_, i) => i % 4 !== 3).includes(t.id)).map((t) => t.name),
   );
 
-  // Week 10: the real schedule. Ms. Ayan and Ms. Marwa part-way through the week; peer visits not started.
+  // Week 10: the real schedule. Ms. Ayan and Ms. Marwa part-way through the week; team leader visits not started.
   const plan: Record<string, { rated: number; complete: boolean; shared: boolean; signed: boolean }> = {
     "Ms. Cornelia": { rated: 20, complete: true, shared: true, signed: false },
     "Ms. Rana": { rated: 20, complete: true, shared: true, signed: true },
@@ -384,7 +384,7 @@ export async function seedDemoData(): Promise<DemoSummary> {
     const observer = observerFor(row.observer);
     const p = plan[row.teacher];
     if (!observer || !p) {
-      // Not started: an observer with a login opens it live during the demo; peer visits stay as scheduled.
+      // Not started: an observer with a login opens it live during the demo; team leader visits stay as scheduled.
       const teacher = teacherByName.get(row.teacher);
       if (!teacher) continue;
       await db.insert(visits).values({
@@ -444,7 +444,7 @@ export async function seedDemoData(): Promise<DemoSummary> {
     }
   }
 
-  // Peer observations: the schedule's peer observers, each with their own rating habit, kept apart from official data.
+  // Team leader observations: the schedule's team leaders, each with their own rating habit, kept apart from official data.
   const peerBias: Record<string, number> = {
     "Ms. Asmaa Aly": -0.8,
     "Ms. Cornelia": -0.4,

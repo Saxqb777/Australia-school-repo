@@ -12,7 +12,7 @@ import { getRubric } from "@/lib/queries";
 import { requireUser } from "@/lib/session";
 import { PeerReview } from "./PeerReview";
 
-export const metadata: Metadata = { title: "Peer observation" };
+export const metadata: Metadata = { title: "Team leader observation" };
 
 export default async function PeerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,10 +28,10 @@ export default async function PeerDetailPage({ params }: { params: Promise<{ id:
   return (
     <AppShell user={user} active="peer" wide>
       <Link href="/peer" className="label-caps hover:text-navy">
-        Peer observations
+        Team leader observations
       </Link>
       <PageHeading
-        eyebrow={peer.observerName ? `Observed by ${peer.observerName}` : "Peer observation"}
+        eyebrow={peer.observerName ? `Observed by ${peer.observerName}` : "Team leader observation"}
         title={peer.teacherName || "Teacher not read"}
       />
       <PeerReview

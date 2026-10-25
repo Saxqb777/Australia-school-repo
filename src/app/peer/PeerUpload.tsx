@@ -56,9 +56,9 @@ export function PeerUpload({ sampleHref }: { sampleHref: string | null }) {
 
   return (
     <div className="border border-rule border-t-4 border-t-navy bg-sheet p-4" data-tour="peer-upload">
-      <h2 className="font-cond text-lg font-semibold">Add a peer observation</h2>
+      <h2 className="font-cond text-lg font-semibold">Add a team leader observation</h2>
       <p className="mt-1 text-sm text-ink-soft">
-        Upload the completed Teacher Observation Form the peer observer handed in: a PDF, a scan, or a clear photo of the
+        Upload the completed Teacher Observation Form the team leader handed in: a PDF, a scan, or a clear photo of the
         printed form. The AI reads the names, class, date, every rating and the comments; you check them against the
         original before saving.
       </p>

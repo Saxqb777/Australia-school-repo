@@ -25,7 +25,7 @@ Phase 1 decisions and why. Newest at the bottom.
      always safe and late arrivals never overwrite newer edits.
    - Opening the page with no signal at all needs an offline app shell, which is on the Proposed list.
 7. **`users` and `teachers` are separate tables.**
-   - Peer observers on the schedule (Ms. Asmaa Aly, Ms. Cornelia and others) are teachers, not observer logins.
+   - Team leaders on the schedule (Ms. Asmaa Aly, Ms. Cornelia and others) are teachers, not observer logins.
    - Their 14 visits are seeded with the observer's name as text, so the register is complete. Only admin sees
      them.
 8. **Access rules are enforced on the server, on every request.**
@@ -94,7 +94,7 @@ Phase 1 decisions and why. Newest at the bottom.
     after it, for attendees marked present.
 27. **Reopening.** Reopening a completed observation withdraws it from the teacher and clears the coordinator
     signature. Once the teacher has signed, it can no longer be reopened.
-28. **Observers who are also observed** (for example a peer observer promoted to observer) keep a "My own
+28. **Observers who are also observed** (for example a team leader promoted to observer) keep a "My own
     observations" page.
 29. **Arabic.** The teacher-facing feedback is translated on demand by the same model and cached until the English
     changes. The rubric wording is never translated.
@@ -104,11 +104,11 @@ Phase 1 decisions and why. Newest at the bottom.
     - The observer role is the coordinator role: full management access, but each coordinator edits only their own
       observations.
     - The admin login alone can Go live, Reset the demo, and reset the admin's own password.
-32. **Peer observations are a separate table** (`peer_observations`, with the original in `peer_files`), so they
+32. **Team leader observations (formerly "peer observations") are a separate table** (`peer_observations`, with the original in `peer_files`), so they
     can never mix with official data.
     - The AI reads the form without guessing: unmarked or unclear rows are left unrated and flagged.
     - Names are matched to staff only when the match is unambiguous.
-    - Only confirmed records count in the "how each peer rates" comparison.
+    - Only confirmed records count in the "how each team leader rates" comparison.
 33. **Files.**
     - Originals are stored in the database: up to 4 MB each, and large photos are scaled down in the browser first.
     - Old .xls Excel files are not supported; save them as .xlsx.

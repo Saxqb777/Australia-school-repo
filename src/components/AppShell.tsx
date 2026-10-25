@@ -25,7 +25,7 @@ const NAV: Record<CurrentUser["role"], { key: NavKey; label: string; href: strin
     { key: "visits", label: "My visits", href: "/visits" },
     { key: "register", label: "Register", href: "/admin" },
     { key: "dashboard", label: "Dashboard", href: "/dashboard" },
-    { key: "peer", label: "Peer observations", href: "/peer" },
+    { key: "peer", label: "Team leader observations", href: "/peer" },
     { key: "workshops", label: "Workshops", href: "/workshops" },
     { key: "teachers", label: "Teachers", href: "/teachers" },
     { key: "setup", label: "Setup", href: "/admin/setup" },
@@ -34,7 +34,7 @@ const NAV: Record<CurrentUser["role"], { key: NavKey; label: string; href: strin
   ADMIN: [
     { key: "register", label: "Register", href: "/admin" },
     { key: "dashboard", label: "Dashboard", href: "/dashboard" },
-    { key: "peer", label: "Peer observations", href: "/peer" },
+    { key: "peer", label: "Team leader observations", href: "/peer" },
     { key: "workshops", label: "Workshops", href: "/workshops" },
     { key: "teachers", label: "Teachers", href: "/teachers" },
     { key: "setup", label: "Setup", href: "/admin/setup" },

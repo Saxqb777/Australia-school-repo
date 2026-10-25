@@ -44,12 +44,12 @@ labelled "Demo" on every page. Nothing here is a real judgement.
 7. **Audit log:** every rating change, who and when.
 8. **Export:** everything to Excel at any time.
 
-## 4b. Peer observations (2 minutes), as **Ms. Ayan**
-1. Open **Peer observations**: forms from teachers who observe colleagues, kept apart from the official ones.
+## 4b. Team leader observations (2 minutes), as **Ms. Ayan**
+1. Open **Team leader observations**: forms from team leaders who observe colleagues, kept apart from the official ones.
 2. Use **download a sample completed form**, then upload it. In about 15 seconds every rating is read, and the
    names are matched to staff.
 3. Check it next to the original and press **Checked: confirm and save**.
-4. Show **How each peer observer rates**: who rates more generously or more strictly than the coordinators.
+4. Show **How each team leader rates**: who rates more generously or more strictly than the coordinators.
 5. In **Setup**, upload a schedule as Excel, PDF or a photo: every row is read and shown for checking before import.
 
 ## 5. Going live

@@ -8,7 +8,7 @@ import { canManage, getCurrentUser } from "@/lib/session";
 
 export const runtime = "nodejs";
 
-/** The original file the peer observer handed in. Coordinators and admin only. */
+/** The original file the team leader handed in. Coordinators and admin only. */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await getCurrentUser();

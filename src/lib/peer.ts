@@ -88,7 +88,7 @@ export async function createPeerFromFile(
     .insert(peerObservations)
     .values({ ...toRecord(reading, rubric, people), fileId: stored?.id ?? null, isDemo, createdByUserId: userId })
     .returning({ id: peerObservations.id });
-  if (!row) throw new Error("Could not save the peer observation");
+  if (!row) throw new Error("Could not save the team leader observation");
   return row.id;
 }
 
@@ -118,8 +118,8 @@ export interface PeerRater {
 }
 
 /**
- * How each peer observer rates, against the coordinators' own latest observation of the same teachers.
- * Only confirmed peer observations count.
+ * How each team leader rates, against the coordinators' own latest observation of the same teachers.
+ * Only confirmed team leader observations count.
  */
 export async function peerRaters(demo: boolean): Promise<PeerRater[]> {
   const rows = (await listPeer(demo)).filter((r) => r.status === "confirmed");
@@ -157,7 +157,7 @@ export async function peerRaters(demo: boolean): Promise<PeerRater[]> {
     .sort((a, b) => a.observerName.localeCompare(b.observerName));
 }
 
-/** Removes demo peer observations and their files. */
+/** Removes demo team leader observations and their files. */
 export async function clearDemoPeer(): Promise<void> {
   const demoRows = await db.select({ fileId: peerObservations.fileId }).from(peerObservations).where(eq(peerObservations.isDemo, true));
   await db.delete(peerObservations).where(eq(peerObservations.isDemo, true));

@@ -94,7 +94,7 @@ export function PeerReview({ id, status, uncertain, fileUrl, fileIsPdf, people, 
   }
 
   async function remove() {
-    if (!window.confirm("Delete this peer observation and its original file?")) return;
+    if (!window.confirm("Delete this team leader observation and its original file?")) return;
     const res = await fetch(`/api/peer/${id}`, { method: "DELETE" });
     if (res.ok) router.push("/peer");
   }
@@ -170,7 +170,7 @@ export function PeerReview({ id, status, uncertain, fileUrl, fileIsPdf, people, 
           </div>
         ) : null}
         <div className="mt-3 grid gap-2 border border-rule bg-sheet p-3 sm:grid-cols-2">
-          {personSelect("Peer observer", "observerTeacherId", "observerName")}
+          {personSelect("Team leader", "observerTeacherId", "observerName")}
           {personSelect("Teacher observed", "teacherId", "teacherName")}
           {text("Class", "className")}
           {text("Subject", "subject")}
@@ -215,7 +215,7 @@ export function PeerReview({ id, status, uncertain, fileUrl, fileIsPdf, people, 
                 {isLevel(level) ? <p className="mt-1.5 text-xs text-ink-soft">{levelLabel(level)}: {c.descriptors[level]}</p> : null}
                 <input
                   className="field mt-2 !py-1.5 !text-sm"
-                  placeholder="Comment, if the peer observer wrote one"
+                  placeholder="Comment, if the team leader wrote one"
                   aria-label={`Comment for ${c.code}`}
                   value={v.comments[String(c.id)] ?? ""}
                   onChange={(e) => setV((s) => ({ ...s, comments: { ...s.comments, [String(c.id)]: e.target.value } }))}
@@ -235,7 +235,7 @@ export function PeerReview({ id, status, uncertain, fileUrl, fileIsPdf, people, 
             <textarea className="field min-h-24" value={v.improvements} onChange={(e) => set("improvements", e.target.value)} />
           </label>
           <label className="block text-xs text-ink-soft">
-            Overall Lesson Judgement (as written by the peer observer)
+            Overall Lesson Judgement (as written by the team leader)
             <select className="field !py-2" value={v.overallLevel ?? ""} onChange={(e) => set("overallLevel", e.target.value ? Number(e.target.value) : null)}>
               <option value="">Not given</option>
               {RATING_LEVELS.map((l) => (
