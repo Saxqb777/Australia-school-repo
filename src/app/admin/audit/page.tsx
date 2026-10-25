@@ -18,7 +18,7 @@ function lvl(v: string | null): string {
 }
 
 export default async function AuditPage() {
-  const user = await requireUser(["ADMIN"]);
+  const user = await requireUser(["ADMIN", "OBSERVER"]);
   const demo = (await getMode()) === "demo";
   const rows = await db
     .select({

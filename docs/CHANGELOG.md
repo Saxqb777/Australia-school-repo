@@ -1,5 +1,23 @@
 # Changelog
 
+## Coordinator access, peer observations, import from any file (2026-10-25)
+- **Ms. Ayan and Ms. Marwa run the system:**
+  - They have every page the administrator has: register, setup, schedule import, people, password resets, rubric
+    wording, workshops, pairing, audit log and full exports.
+  - They see every observation and change only their own.
+  - Go live and Reset demo stay with the administrator.
+- **Peer observations**, a separate section:
+  - Upload the completed form a peer observer hands in: a PDF, a scan or a photo, typed or handwritten. The AI reads
+    the names, class, date, every rating, comments, strengths and improvements.
+  - Anything unclear is flagged. The coordinator checks it next to the original, corrects it and confirms.
+  - "How each peer observer rates" compares each peer observer's ratings with the coordinators' own latest
+    observation of the same teachers.
+  - Never counted in the dashboard, experts, workshops or a teacher's own page. Visible only to the coordinators
+    and the administrator.
+- **Schedule import from any file:**
+  - Excel (.xlsx), including merged observer cells, and CSV are read directly.
+  - PDF, Word (.docx) and photos are read by AI into the preview table for checking before import.
+
 ## Phases 2, 3 and 4, with demo mode and Go live (2026-10-24)
 
 ### Phase 2: AI feedback

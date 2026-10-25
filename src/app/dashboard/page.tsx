@@ -8,7 +8,7 @@ import { filtersToQuery, loadDashboard, parseFilters } from "@/lib/dashboard";
 import { levelLabel, type Level } from "@/lib/judgement";
 import { getMode } from "@/lib/mode";
 import { GRADE_BAND_LABELS } from "@/lib/names";
-import { requireUser } from "@/lib/session";
+import { canManage, requireUser } from "@/lib/session";
 import { DASHBOARD_TOUR } from "@/lib/tours";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -25,7 +25,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const demo = (await getMode()) === "demo";
   const filters = parseFilters(await searchParams);
   const data = await loadDashboard(demo, filters);
-  const isAdmin = user.role === "ADMIN";
+  const isAdmin = canManage(user);
   const areaOrder = [...data.rubric].sort((a, b) => (data.areaMean.get(b.id) ?? 0) - (data.areaMean.get(a.id) ?? 0));
   const expertCount = new Set([...data.experts.values()].flat().map((t) => t.teacherId)).size;
   const flaggedCount = new Set([...data.flagged.values()].flat().map((t) => t.teacherId)).size;

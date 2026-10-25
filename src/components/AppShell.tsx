@@ -15,6 +15,7 @@ type NavKey =
   | "teachers"
   | "setup"
   | "audit"
+  | "peer"
   | "my"
   | "my-workshops"
   | "notifications";
@@ -22,13 +23,18 @@ type NavKey =
 const NAV: Record<CurrentUser["role"], { key: NavKey; label: string; href: string }[]> = {
   OBSERVER: [
     { key: "visits", label: "My visits", href: "/visits" },
+    { key: "register", label: "Register", href: "/admin" },
     { key: "dashboard", label: "Dashboard", href: "/dashboard" },
+    { key: "peer", label: "Peer observations", href: "/peer" },
     { key: "workshops", label: "Workshops", href: "/workshops" },
     { key: "teachers", label: "Teachers", href: "/teachers" },
+    { key: "setup", label: "Setup", href: "/admin/setup" },
+    { key: "audit", label: "Audit log", href: "/admin/audit" },
   ],
   ADMIN: [
     { key: "register", label: "Register", href: "/admin" },
     { key: "dashboard", label: "Dashboard", href: "/dashboard" },
+    { key: "peer", label: "Peer observations", href: "/peer" },
     { key: "workshops", label: "Workshops", href: "/workshops" },
     { key: "teachers", label: "Teachers", href: "/teachers" },
     { key: "setup", label: "Setup", href: "/admin/setup" },

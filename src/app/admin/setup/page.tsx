@@ -9,9 +9,10 @@ import { ROLE_LABEL, requireUser } from "@/lib/session";
 import { CycleForm, PersonForm, ScheduleForm } from "./SetupForms";
 
 export const metadata: Metadata = { title: "Setup" };
+export const maxDuration = 120;
 
 export default async function SetupPage() {
-  const user = await requireUser(["ADMIN"]);
+  const user = await requireUser(["ADMIN", "OBSERVER"]);
   const demo = (await getMode()) === "demo";
   const [cycles, people] = await Promise.all([listCycles(demo), listUsers()]);
   return (

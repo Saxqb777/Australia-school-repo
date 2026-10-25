@@ -100,3 +100,15 @@ Phase 1 decisions and why. Newest at the bottom.
     changes. The rubric wording is never translated.
 30. **PDF** uses the built-in Helvetica for reliable print. Hyphenation is disabled so descriptor wording reads
     exactly as on the form.
+31. **Coordinators.**
+    - The observer role is the coordinator role: full management access, but each coordinator edits only their own
+      observations.
+    - The admin login alone can Go live, Reset the demo, and reset the admin's own password.
+32. **Peer observations are a separate table** (`peer_observations`, with the original in `peer_files`), so they
+    can never mix with official data.
+    - The AI reads the form without guessing: unmarked or unclear rows are left unrated and flagged.
+    - Names are matched to staff only when the match is unambiguous.
+    - Only confirmed records count in the "how each peer rates" comparison.
+33. **Files.**
+    - Originals are stored in the database: up to 4 MB each, and large photos are scaled down in the browser first.
+    - Old .xls Excel files are not supported; save them as .xlsx.

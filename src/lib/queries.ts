@@ -421,7 +421,7 @@ export interface PreviousObservation {
 
 /**
  * The teacher's most recent earlier observation that has ratings. Levels are shown to any observer
- * (the school dashboard shows them too); comments only to the observer who wrote them, or admin.
+ * (the school dashboard shows them too); comments to the coordinators and admin.
  */
 export async function getPreviousObservation(
   visit: VisitSummary,
@@ -443,7 +443,7 @@ export async function getPreviousObservation(
     const state = await getObservationState(other);
     const rated = Object.values(state.ratings).some((r) => r.level !== null);
     if (!rated) continue;
-    const own = viewer.role === "ADMIN" || other.observerUserId === viewer.id;
+    const own = viewer.role === "ADMIN" || viewer.role === "OBSERVER" || other.observerUserId === viewer.id;
     const ratings: PreviousObservation["ratings"] = {};
     for (const [id, r] of Object.entries(state.ratings)) {
       ratings[Number(id)] = { level: r.level, comment: own ? r.comment : "" };

@@ -8,11 +8,12 @@ import { observationCycles, rubricCriteria, rubricDescriptors, rubricEdits, teac
 import { getMode } from "@/lib/mode";
 import { createLogin, ensureTeacher, type NewLogin } from "@/lib/people";
 import { parseSchedule, type ParsedVisit } from "@/lib/schedule-import";
-import { getCurrentUser } from "@/lib/session";
+import { scheduleFileToText } from "@/lib/schedule-files";
+import { canManage, getCurrentUser } from "@/lib/session";
 
 async function requireAdmin() {
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") throw new Error("Only the administrator can do this.");
+  if (!user || !canManage(user)) throw new Error("Only the coordinators and the administrator can do this.");
   return user;
 }
 
@@ -56,9 +57,14 @@ export async function importScheduleAction(_prev: SetupState, formData: FormData
   const step = String(formData.get("step") ?? "preview");
   let text = String(formData.get("text") ?? "");
   const file = formData.get("file");
-  if (file instanceof File && file.size > 0) {
-    if (file.size > 500_000) return { ok: false, message: "That file is too large for a schedule." };
-    text = await file.text();
+  // The file is read once, at the check step; importing uses the checked table text.
+  if (step !== "import" && file instanceof File && file.size > 0) {
+    if (file.size > 4_000_000) return { ok: false, message: "That file is too large. Keep schedule files under 4 MB." };
+    try {
+      text = await scheduleFileToText(file);
+    } catch (error) {
+      return { ok: false, message: error instanceof Error ? error.message : "That file could not be read.", cycleId };
+    }
   }
   const cycle = await db.query.observationCycles.findFirst({ where: eq(observationCycles.id, cycleId) });
   if (!cycle) return { ok: false, message: "Choose the cycle this schedule belongs to.", text };
@@ -150,6 +156,8 @@ export async function changeRoleAction(formData: FormData): Promise<void> {
   const userId = z.uuid().parse(formData.get("userId"));
   const role = z.enum(["TEACHER", "OBSERVER"]).parse(formData.get("role"));
   if (userId === admin.id) return;
+  const target = await db.query.users.findFirst({ where: eq(users.id, userId), columns: { role: true } });
+  if (!target || target.role === "ADMIN") return;
   await db.update(users).set({ role, updatedAt: new Date() }).where(eq(users.id, userId));
   // Visits on the schedule under this person's name become theirs to record once they are an observer.
   if (role === "OBSERVER") {

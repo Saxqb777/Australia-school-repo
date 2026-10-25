@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  customType,
   check,
   date,
   index,
@@ -379,6 +380,68 @@ export const rubricEdits = pgTable("rubric_edits", {
   editedByUserId: uuid("edited_by_user_id").references(() => users.id, { onDelete: "set null" }),
   editedAt: timestamp("edited_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+const bytea = customType<{ data: Buffer; driverData: string | Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+  toDriver(value: Buffer) {
+    return `\\x${value.toString("hex")}`;
+  },
+  fromDriver(value: string | Buffer) {
+    if (Buffer.isBuffer(value)) return value;
+    return Buffer.from(value.startsWith("\\x") ? value.slice(2) : value, "hex");
+  },
+});
+
+/** The original file a peer observer handed in (PDF, scan or photo), kept so it can be checked against. */
+export const peerFiles = pgTable("peer_files", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  fileName: text("file_name").notNull(),
+  mimeType: text("mime_type").notNull(),
+  data: bytea("data").notNull(),
+  createdAt: createdAt(),
+});
+
+export const peerStatusEnum = pgEnum("peer_status", ["needs_check", "confirmed"]);
+
+/**
+ * Observations made by teachers without an observer login, read from the paper or PDF form they hand in.
+ * Kept completely apart from official observations: never in the dashboard, experts, workshops or teacher portal.
+ */
+export const peerObservations = pgTable(
+  "peer_observations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fileId: uuid("file_id").references(() => peerFiles.id, { onDelete: "set null" }),
+    observerTeacherId: uuid("observer_teacher_id").references(() => teachers.id, { onDelete: "set null" }),
+    observerName: text("observer_name").notNull().default(""),
+    teacherId: uuid("teacher_id").references(() => teachers.id, { onDelete: "set null" }),
+    teacherName: text("teacher_name").notNull().default(""),
+    className: text("class_name"),
+    subject: text("subject"),
+    date: date("date"),
+    period: integer("period"),
+    topic: text("topic"),
+    /** criterion id -> level 1..6 */
+    ratings: jsonb("ratings").$type<Record<string, number>>().notNull().default({}),
+    /** criterion id -> comment */
+    comments: jsonb("comments").$type<Record<string, string>>().notNull().default({}),
+    strengths: text("strengths"),
+    improvements: text("improvements"),
+    overallLevel: integer("overall_level"),
+    /** What the AI was unsure of, for the coordinator to check against the original. */
+    uncertain: jsonb("uncertain").$type<string[]>().notNull().default([]),
+    status: peerStatusEnum("status").notNull().default("needs_check"),
+    isDemo: boolean("is_demo").notNull().default(false),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    confirmedByUserId: uuid("confirmed_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("peer_observations_teacher_idx").on(t.teacherId), index("peer_observations_observer_idx").on(t.observerTeacherId)],
+);
 
 export const appSettings = pgTable("app_settings", {
   key: text("key").primaryKey(),

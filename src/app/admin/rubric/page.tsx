@@ -11,7 +11,7 @@ import { CriterionEditor } from "./RubricEditor";
 export const metadata: Metadata = { title: "Rubric wording" };
 
 export default async function RubricPage() {
-  const user = await requireUser(["ADMIN"]);
+  const user = await requireUser(["ADMIN", "OBSERVER"]);
   const rubric = await getRubric();
   const history = await db
     .select({

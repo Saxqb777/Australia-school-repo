@@ -50,7 +50,7 @@ export default async function ObservePage({ params }: { params: Promise<{ visitI
         initial={state}
         readOnly={readOnly}
         previous={previous}
-        backHref={user.role === "ADMIN" && readOnly ? "/admin" : "/visits"}
+        backHref={readOnly ? "/admin" : "/visits"}
         shareInfo={{
           sharedAt: state.sharedAt,
           openedAt: opened?.openedAt?.toISOString() ?? null,

@@ -19,7 +19,7 @@ import { ResetPassword } from "./ResetPassword";
 export const metadata: Metadata = { title: "Register" };
 
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ cycle?: string }> }) {
-  const user = await requireUser(["ADMIN"]);
+  const user = await requireUser(["ADMIN", "OBSERVER"]);
   const demo = (await getMode()) === "demo";
   const cycles = await listCycles(demo);
   const { cycle } = await searchParams;
@@ -170,7 +170,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   <td className="px-3 py-2">{ROLE_LABEL[p.role]}</td>
                   <td className="px-3 py-2 text-ink-soft">{p.mustChangePassword ? "Temporary" : "Chosen"}</td>
                   <td className="px-3 py-2 text-right">
-                    {demo ? (
+                    {p.role === "ADMIN" && user.role !== "ADMIN" ? (
+                      <span className="text-xs text-ink-faint">Administrator only</span>
+                    ) : demo ? (
                       <span className="text-xs text-ink-faint">After Go live</span>
                     ) : p.id === user.id ? (
                       <Link href="/change-password" className="text-sm font-medium text-navy underline underline-offset-2">

@@ -24,7 +24,7 @@ const STATUS_LABEL: Record<VisitListItem["status"], string> = {
 
 /** Builds the export for one user. Observers get only their own visits; admin gets everything. Never passwords. */
 export async function buildExport(user: CurrentUser, demo: boolean): Promise<Sheet[]> {
-  const isAdmin = user.role === "ADMIN";
+  const isAdmin = user.role === "ADMIN" || user.role === "OBSERVER";
   const [visitList, rubric] = await Promise.all([
     listVisits(isAdmin ? { demo } : { demo, observerUserId: user.id }),
     getRubric(),

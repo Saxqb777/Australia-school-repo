@@ -22,6 +22,13 @@
       "when": 1792863151744,
       "tag": "0002_phase2to4",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792921331749,
+      "tag": "0003_peer_observations",
+      "breakpoints": true
     }
   ]
 }

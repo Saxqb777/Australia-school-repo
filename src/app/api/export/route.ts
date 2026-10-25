@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   if (user.role === "TEACHER") return new Response("Teachers can open each observation as a PDF from their page.", { status: 403 });
   const format = new URL(request.url).searchParams.get("format") === "csv" ? "csv" : "xlsx";
   const sheets = await buildExport(user, (await getMode()) === "demo");
-  const who = user.role === "ADMIN" ? "all" : user.username.replace(/[^a-z0-9.]/gi, "");
+  const who = "all";
   const base = `asad-observations-${who}-${stamp()}`;
   const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
 

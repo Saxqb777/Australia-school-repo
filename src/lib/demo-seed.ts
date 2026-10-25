@@ -1,6 +1,6 @@
 import "server-only";
 import { createHash } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import {
 
@@ -11,6 +11,8 @@ import {
   observationCycles,
   observationRatings,
   observations,
+  peerFiles,
+  peerObservations,
   peerPairings,
   ratingAudit,
   rubricAreas,
@@ -33,6 +35,10 @@ export async function clearDemoData(): Promise<void> {
   await db.delete(workshops).where(eq(workshops.isDemo, true));
   await db.delete(digests).where(eq(digests.isDemo, true));
   await db.delete(observationCycles).where(eq(observationCycles.isDemo, true));
+  const demoPeer = await db.select({ fileId: peerObservations.fileId }).from(peerObservations).where(eq(peerObservations.isDemo, true));
+  await db.delete(peerObservations).where(eq(peerObservations.isDemo, true));
+  const fileIds = demoPeer.map((r) => r.fileId).filter((id): id is string => id !== null);
+  if (fileIds.length > 0) await db.delete(peerFiles).where(inArray(peerFiles.id, fileIds));
 }
 
 function hashInt(s: string): number {
@@ -436,6 +442,48 @@ export async function seedDemoData(): Promise<DemoSummary> {
     if (partner && partner !== t) {
       await db.insert(peerPairings).values({ teacherId: t, partnerTeacherId: partner, areaId: workshopArea, introducedByUserId: admin.id, isDemo: true }).onConflictDoNothing();
     }
+  }
+
+  // Peer observations: the schedule's peer observers, each with their own rating habit, kept apart from official data.
+  const peerBias: Record<string, number> = {
+    "Ms. Asmaa Aly": -0.8,
+    "Ms. Cornelia": -0.4,
+    "Ms. Rana": 0,
+    "Ms. Riham": 0.6,
+    "Ms. Walaa": -0.5,
+    "Ms. Amira": 0.3,
+    "Ms. Wafaa": -1,
+  };
+  const peerRows = SCHEDULE.filter((r) => !observerFor(r.observer));
+  for (const [i, row] of peerRows.entries()) {
+    const teacher = teacherByName.get(row.teacher);
+    const observerTeacher = teacherByName.get(row.observer);
+    if (!teacher) continue;
+    const profile = profiles.get(row.teacher) ?? profileFor(row.teacher, areaIds);
+    const levels = ratingsFor(row.teacher, "w10", profile, criteria, null);
+    const ratings: Record<string, number> = {};
+    for (const c of criteria) ratings[String(c.id)] = clamp((levels.get(c.id) ?? 3) + (peerBias[row.observer] ?? 0));
+    const confirmed = i % 5 !== 4;
+    await db.insert(peerObservations).values({
+      observerTeacherId: observerTeacher?.id ?? null,
+      observerName: row.observer,
+      teacherId: teacher.id,
+      teacherName: row.teacher,
+      className: row.className,
+      subject: row.subject,
+      date: DAY_DATES[row.day],
+      period: row.period,
+      ratings,
+      comments: {},
+      strengths: "Positive relationships with the class.\nClear routines.",
+      improvements: "Plan more challenge for those who finish early.",
+      status: confirmed ? "confirmed" : "needs_check",
+      uncertain: confirmed ? [] : ["1.3: the mark looks unclear; check the original."],
+      isDemo: true,
+      createdByUserId: ayan.id,
+      confirmedByUserId: confirmed ? ayan.id : null,
+      confirmedAt: confirmed ? new Date() : null,
+    });
   }
 
   // A rating change in the audit log, and a few in-app notices.

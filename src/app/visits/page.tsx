@@ -27,7 +27,7 @@ export default async function VisitsPage() {
         <span data-tour="replay">
           <ReplayTourButton />
         </span>
-        <ExportMenu scopeLabel="Your visits, ratings and comments" />
+        <ExportMenu scopeLabel="Everything: visits, ratings, judgements, feedback, teachers, logins (no passwords), rubric" />
       </PageHeading>
 
       {visits.length === 0 ? (

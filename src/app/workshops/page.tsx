@@ -4,7 +4,7 @@ import { AppShell, PageHeading } from "@/components/AppShell";
 import { WorkshopList } from "@/components/WorkshopList";
 import { getMode } from "@/lib/mode";
 import { getRubric, loadFacts } from "@/lib/queries";
-import { requireUser } from "@/lib/session";
+import { canManage, requireUser } from "@/lib/session";
 import { listWorkshops } from "@/lib/workshops";
 
 export const metadata: Metadata = { title: "Workshops" };
@@ -28,7 +28,7 @@ export default async function WorkshopsPage() {
           administrator schedules one with a click and the attendees are told in the app.
         </p>
       ) : (
-        <WorkshopList items={items} admin={user.role === "ADMIN"} />
+        <WorkshopList items={items} admin={canManage(user)} />
       )}
     </AppShell>
   );

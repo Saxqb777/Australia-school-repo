@@ -8,7 +8,7 @@ import type { CurrentUser } from "./session";
 export type VisitAccess = "edit" | "read" | "teacher" | "none";
 
 /**
- * Observers edit only their own visits. Admin reads every visit and edits only visits assigned to them.
+ * Observers (the coordinators) and admin read every visit and edit only visits assigned to them.
  * A teacher reads only their own observation, and only once it has been shared with them.
  * Demo visits are reachable only before Go live, real visits only after.
  */
@@ -29,9 +29,10 @@ export async function visitAccess(user: CurrentUser, visitId: string): Promise<V
   if (!visit) return "none";
   if (visit.isDemo !== ((await getMode()) === "demo")) return "none";
   if (visit.observerUserId === user.id && (user.role === "OBSERVER" || user.role === "ADMIN")) return "edit";
-  if (user.role === "ADMIN") return "read";
   // The observed teacher (whatever else they do in school) sees their own observation once it is shared.
   if (visit.teacherUserId === user.id && visit.sharedAt !== null) return "teacher";
+  // Admin and the coordinators read every observation; each edits only their own.
+  if (user.role === "ADMIN" || user.role === "OBSERVER") return "read";
   return "none";
 }
 

@@ -7,11 +7,11 @@ import { z } from "zod";
 import { db } from "@/db";
 import { notifications, peerPairings, rubricAreas, teachers, workshopAttendees, workshops } from "@/db/schema";
 import { getMode } from "@/lib/mode";
-import { getCurrentUser } from "@/lib/session";
+import { canManage, getCurrentUser } from "@/lib/session";
 
 async function requireAdmin() {
   const user = await getCurrentUser();
-  if (!user || user.role !== "ADMIN") throw new Error("Only the administrator can do this.");
+  if (!user || !canManage(user)) throw new Error("Only the coordinators and the administrator can do this.");
   return user;
 }
 

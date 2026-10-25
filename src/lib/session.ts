@@ -57,6 +57,11 @@ export async function requireUser(roles?: Role[]): Promise<CurrentUser> {
   return user;
 }
 
+/** Ms. Ayan and Ms. Marwa (observers) run the system day to day; the admin login has the same powers plus Go live. */
+export function canManage(user: Pick<CurrentUser, "role">): boolean {
+  return user.role === "ADMIN" || user.role === "OBSERVER";
+}
+
 export function homePathFor(role: Role): string {
   if (role === "ADMIN") return "/admin";
   if (role === "OBSERVER") return "/visits";

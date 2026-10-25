@@ -101,16 +101,22 @@ export function ScheduleForm({ cycles }: { cycles: { id: string; label: string }
         />
       </label>
       <label className="block text-xs text-ink-soft">
-        Or choose a CSV file
-        <input name="file" type="file" accept=".csv,text/csv,text/plain" className="mt-1 block text-sm" />
+        Or upload the schedule: Excel, CSV, PDF, Word, or a photo of the printed table
+        <input
+          name="file"
+          type="file"
+          accept=".xlsx,.csv,.tsv,.txt,.pdf,.docx,.jpg,.jpeg,.png,.webp,application/pdf,image/*"
+          className="mt-1 block text-sm"
+        />
       </label>
       <p className="text-xs text-ink-soft">
         Columns: Observer, Teacher, Class, Subject, Date (or Day), Period. A blank observer repeats the one above, as on the
-        school&rsquo;s schedule. New teachers get a teacher login automatically.
+        school&rsquo;s schedule. PDF, Word and photos are read by AI and appear in the box above for you to check. New
+        teachers get a teacher login automatically.
       </p>
       <div className="flex flex-wrap gap-2">
         <button type="submit" name="step" value="preview" className="btn btn-quiet" disabled={pending}>
-          Check the schedule
+          {pending ? "Reading…" : "Check the schedule"}
         </button>
         {state.preview && state.preview.errors.length === 0 && state.preview.rows.length > 0 ? (
           <button type="submit" name="step" value="import" className="btn btn-primary" disabled={pending}>
